@@ -5,21 +5,18 @@ A fullstack web application built with **React.js** for the frontend, **Express.
 ## 🛠 Tech Stack
 
 **Frontend**
-- React.js
-- Vite / Create React App
+- React.js Vite
 - Axios
-- Tailwind CSS (optional)
+- Tailwind CSS
 
 **Backend**
 - Node.js
 - Express.js
 - MongoDB (Mongoose)
-- JWT Authentication (optional)
+- JWT Authentication
 
 **Database**
-- MongoDB Local / MongoDB Atlas
+- MongoDB
 
 ---
-
-## 📁 Project Structure
 
