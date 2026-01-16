@@ -20,3 +20,15 @@ A fullstack web application built with **React.js** for the frontend, **Express.
 
 ---
 
+## ⚙️ Installasi
+Frontend
+```bash
+cd frontend
+npm install
+
+```
+
+Backend
+```bash
+cd backend
+npm install
