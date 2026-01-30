@@ -3,6 +3,7 @@ import MenuSelection from "../components/MenuSelection";
 import BgImage from "../assets/background/ion.jpeg";
 import IonPuzzleWrapper from "../components/puzzle/IonPuzzleWrapper";
 import NextButton from "../components/ButtonNext";
+import BackButton from "../components/ButtonBack";
 import DialogBox from "../components/DialogueBox";
 import FinalDialogue from "../components/FinalDialogue";
 import avatar from "../assets/avatar.png";
@@ -100,47 +101,7 @@ const RoomIon: React.FC = () => {
         onFinish={handleFinish}
       />
 
-      {/* =============================
-              VIDEO PEMBELAJARAN
-          ============================= */}
-      <div
-        style={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-          width: "420px",
-          background: "rgba(0,0,0,0.4)",
-          padding: "10px",
-          borderRadius: "12px",
-        }}
-      >
-        <h1 className="text-white font-semibold text-center p-4">
-          Video Materi
-        </h1>
-        <iframe
-          width="100%"
-          height="200"
-          src="https://www.youtube.com/embed/XjmTfkf8z3c?si=uHXJLsNau1fftfYG"
-          title="Video Ikatan Kovalen"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-
-        <iframe
-          className="mt-4"
-          width="100%"
-          height="200"
-          src="https://www.youtube.com/embed/XJAs7jPC8pc?si=Esa8vUhxAQ1RRKzJ"
-          title="Video Ikatan Kovalen"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-
-        {/* Tambah Video Disini */}
-
-      </div>
+      
 
       {/* =============================
                   MARQUEE INFO
@@ -151,6 +112,15 @@ const RoomIon: React.FC = () => {
           speed={16}
         />
       </div>
+
+      {/* =============================
+          BACK BUTTON
+      ============================= */}
+      {!showFinalDialog && (
+        <div style={{ position: "absolute", bottom: 20, left: 20 }}>
+          <BackButton to="/" />
+        </div>
+      )}
 
       {/* =============================
           NEXT BUTTON

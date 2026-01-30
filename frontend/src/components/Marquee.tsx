@@ -5,7 +5,7 @@ interface MarqueeProps {
   speed?: number;
   height?: number;
   color?: string;
-  blinkSpeed?: number; // kecepatan kedip (detik)
+  blinkSpeed?: number;
 }
 
 const Marquee: React.FC<MarqueeProps> = ({
@@ -16,14 +16,15 @@ const Marquee: React.FC<MarqueeProps> = ({
   blinkSpeed = 1.2,
 }) => {
   const gap = "   ⚠️   ";
+  const content = `${text}${gap}`;
 
   return (
     <div
       style={{
         position: "absolute",
         top: 0,
-        right: 0,
-        width: "50%",
+        left: 0,
+        width: "100%",
         height: `${height}px`,
         overflow: "hidden",
         backgroundColor: "rgba(220, 0, 0, 0.6)",
@@ -34,58 +35,46 @@ const Marquee: React.FC<MarqueeProps> = ({
         animation: `blink ${blinkSpeed}s infinite`,
       }}
     >
-      {/* STYLE ANIMASI */}
       <style>
         {`
-          @keyframes marquee-tsx {
-            0% {
-              transform: translateX(0%);
+          @keyframes marquee-smooth {
+            from {
+              transform: translateX(0);
             }
-            100% {
-              transform: translateX(-50%);
+            to {
+              transform: translateX(-30%);
             }
           }
 
           @keyframes blink {
-            0%, 100% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.4;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
           }
         `}
       </style>
 
-      {/* TRACK */}
       <div
         style={{
           display: "flex",
-          whiteSpace: "nowrap",
-          animation: `marquee-tsx ${speed}s linear infinite`,
+          width: "max-content",
+          animation: `marquee-smooth ${speed}s linear infinite`,
         }}
       >
-        <span
-          style={{
-            fontSize: height * 0.5,
-            lineHeight: `${height}px`,
-            paddingRight: "40px",
-          }}
-        >
-          {text}
-          {gap}
-        </span>
-
-        <span
-          style={{
-            fontSize: height * 0.5,
-            lineHeight: `${height}px`,
-          }}
-        >
-          {text}
-          {gap}
-        </span>
+        {[...Array(4)].map((_, i) => (
+          <div key={i} style={{ whiteSpace: "nowrap" }}>
+            <span
+              style={{
+                fontSize: height * 0.5,
+                lineHeight: `${height}px`,
+              }}
+            >
+              {content}
+            </span>
+          </div>
+        ))}
       </div>
+
+
     </div>
   );
 };

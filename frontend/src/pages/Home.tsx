@@ -19,10 +19,12 @@ const Home: React.FC = () => {
         height: "100vh",
       }}
     >
-      {/* Button Mulai */}
-      <button
-        onClick={() => setShowModal(true)}
-        className="
+
+      <div className="flex-col space-x-4">
+        {/* Button Mulai */}
+        <button
+          onClick={() => setShowModal(true)}
+          className="
           inline-block
           mt-20
           px-6 py-4
@@ -35,9 +37,30 @@ const Home: React.FC = () => {
           hover:-translate-y-1
           active:translate-y-2
         "
-      >
-        Mulai Sekarang
-      </button>
+        >
+          Mulai Sekarang 🚀
+        </button>
+
+        {/* PLAY VIDEO */}
+        <button
+          onClick={() => setShowModal(true)}
+          className="
+          inline-block
+          mt-20
+          px-6 py-4
+          bg-yellow-600
+          text-white
+          font-semibold
+          rounded-xl
+          shadow-[0_8px_0_#be185d,0_12px_20px_rgba(0,0,0,0.25)]
+          transition-all
+          hover:-translate-y-1
+          active:translate-y-2
+        "
+        >
+          Play Video ▶
+        </button>
+      </div>
 
       {/* Dialog Narasi */}
       <DialogBox
@@ -82,6 +105,34 @@ const Home: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* ===== Modal Video ===== */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="relative bg-black rounded-xl overflow-hidden w-[100%] max-w-3xl">
+
+            {/* Tombol Close */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-3 right-3 text-white text-xl z-50 w-10 h-10 rounded-full bg-violet-500 hover:scale-105 duration-200 shadow-lg shadow-black/40"
+            >
+              ✕
+            </button>
+
+            {/* Video */}
+            <iframe
+              width="100%"
+              height="500"
+              src="https://www.youtube.com/embed/_WRanc99nUQ?si=W0MntwCtGlmvBSbs"
+              title="YouTube video"
+              allow="autoplay"
+              allowFullScreen
+            />
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
