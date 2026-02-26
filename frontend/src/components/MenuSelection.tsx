@@ -12,6 +12,7 @@ interface Question {
   question: string;
   options: string[];
   correctAnswer: number;
+  explanation?: string;
 }
 
 interface MenuSelectionProps {
@@ -33,6 +34,7 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
   const [showPre, setShowPre] = useState(false);
   const [showPost, setShowPost] = useState(false);
   const [showPuzzle, setShowPuzzle] = useState(false);
+  const [reviewData, setReviewData] = useState<any[]>([]);
 
   const [pretestResult, setPretestResult] = useState<{
     score: number;
@@ -120,6 +122,17 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
           questions={posttestQuestions}
           onSubmit={(data) => {
             setPosttestResult(data);
+
+            // 🔥 BUAT REVIEW DATA DI SINI
+            const review = posttestQuestions.map((q, index) => ({
+              question: q.question,
+              userAnswer: q.options[data.answers[index]],
+              correctAnswer: q.options[q.correctAnswer],
+              explanation: q.explanation || "Tidak ada pembahasan.",
+            }));
+
+            setReviewData(review);
+
             setResult({ title: "Post-test Selesai", score: data.score });
 
             if (pretestResult && onFinish) {
@@ -145,6 +158,7 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
         <ScoreResultModal
           title={result.title}
           score={result.score}
+          reviewData={reviewData}
           onClose={() => setResult(null)}
         />
       )}

@@ -4,7 +4,8 @@ import DialogBox from "../components/DialogueBox";
 import avatar from "../assets/avatar.png";
 
 const Home: React.FC = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const [name, setName] = useState("");
 
   return (
@@ -23,7 +24,7 @@ const Home: React.FC = () => {
       <div className="flex-col space-x-4">
         {/* Button Mulai */}
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowNameModal(true)}
           className="
           inline-block
           mt-20
@@ -43,7 +44,7 @@ const Home: React.FC = () => {
 
         {/* PLAY VIDEO */}
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowVideoModal(true)}
           className="
           inline-block
           mt-20
@@ -78,7 +79,7 @@ const Home: React.FC = () => {
       />
 
       {/* MODAL INPUT NAMA */}
-      {showModal && (
+      {showNameModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-xl shadow-xl space-y-4 w-80">
             <h2 className="text-lg font-semibold text-center text-black">
@@ -107,13 +108,13 @@ const Home: React.FC = () => {
       )}
 
       {/* ===== Modal Video ===== */}
-      {showModal && (
+      {showVideoModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="relative bg-black rounded-xl overflow-hidden w-[100%] max-w-3xl">
 
             {/* Tombol Close */}
             <button
-              onClick={() => setShowModal(false)}
+              onClick={() => setShowVideoModal(false)}
               className="absolute top-3 right-3 text-white text-xl z-50 w-10 h-10 rounded-full bg-violet-500 hover:scale-105 duration-200 shadow-lg shadow-black/40"
             >
               ✕

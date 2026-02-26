@@ -132,9 +132,17 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
     /* =============================
        DRAG
     ============================= */
-    this.input.on("drag", (_p, obj: Phaser.GameObjects.Image, x, y) => {
-      obj.setPosition(x, y);
-    });
+    this.input.on(
+      "drag",
+      (
+        _p: Phaser.Input.Pointer,
+        obj: Phaser.GameObjects.Image,
+        x: number,
+        y: number
+      ) => {
+        obj.setPosition(x, y);
+      }
+    );
 
     /* =============================
        DROP
@@ -142,7 +150,7 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
     this.input.on(
       "drop",
       (
-        _,
+        _pointer: Phaser.Input.Pointer,
         obj: Phaser.GameObjects.Image,
         zone: Phaser.GameObjects.Zone & { forceType: IntermolecularForce }
       ) => {
@@ -183,8 +191,8 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
     const zone = this.add
       .zone(x, y, 200, 90)
       .setRectangleDropZone(200, 90) as Phaser.GameObjects.Zone & {
-      forceType: IntermolecularForce;
-    };
+        forceType: IntermolecularForce;
+      };
 
     zone.forceType = type;
 

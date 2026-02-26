@@ -24,6 +24,7 @@ const RoomIon: React.FC = () => {
         "Ikatan karena gaya magnet",
       ],
       correctAnswer: 1,
+
     },
     {
       question: "Ikatan kovalen biasanya terjadi antara...",
@@ -47,11 +48,15 @@ const RoomIon: React.FC = () => {
         "Karena suhu tinggi",
       ],
       correctAnswer: 0,
+      explanation:
+        "Atom membentuk ikatan kovalen untuk mencapai konfigurasi elektron stabil seperti gas mulia.",
     },
     {
       question: "Contoh senyawa dengan ikatan kovalen adalah...",
       options: ["NaCl", "KBr", "H₂O", "CaO"],
       correctAnswer: 2,
+      explanation:
+        "H₂O merupakan senyawa kovalen karena terbentuk dari sesama nonlogam yang berbagi elektron.",
     },
   ];
 
@@ -101,7 +106,7 @@ const RoomIon: React.FC = () => {
         onFinish={handleFinish}
       />
 
-      
+
 
       {/* =============================
                   MARQUEE INFO
