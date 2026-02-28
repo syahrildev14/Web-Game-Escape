@@ -1,4 +1,4 @@
-# 🚀 Fullstack Web App (React + Express + MongoDB)
+# 🚀 Fullstack Web App (React + Express + MySql)
 
 ## 🛠 Tech Stack
 
