@@ -109,6 +109,24 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
           questions={pretestQuestions}
           onSubmit={(data) => {
             setPretestResult(data);
+
+            // 🔥 TAMBAHKAN REVIEW DATA DI SINI
+            const review = pretestQuestions.map((q, index) => {
+              const userAnswerIndex = data.answers[index];
+
+              return {
+                question: q.question,
+                userAnswer: q.options[userAnswerIndex] ?? "-",
+                correctAnswer: q.options[q.correctAnswer],
+                explanation:
+                  q.explanation && q.explanation.trim() !== ""
+                    ? q.explanation
+                    : "Tidak ada pembahasan.",
+              };
+            });
+
+            setReviewData(review);
+
             setResult({ title: "Pre-test Selesai", score: data.score });
           }}
           onClose={() => setShowPre(false)}
@@ -124,12 +142,19 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
             setPosttestResult(data);
 
             // 🔥 BUAT REVIEW DATA DI SINI
-            const review = posttestQuestions.map((q, index) => ({
-              question: q.question,
-              userAnswer: q.options[data.answers[index]],
-              correctAnswer: q.options[q.correctAnswer],
-              explanation: q.explanation || "Tidak ada pembahasan.",
-            }));
+            const review = posttestQuestions.map((q, index) => {
+              const userAnswerIndex = data.answers[index];
+
+              return {
+                question: q.question,
+                userAnswer: q.options[userAnswerIndex] ?? "-",
+                correctAnswer: q.options[q.correctAnswer],
+                explanation:
+                  q.explanation && q.explanation.trim() !== ""
+                    ? q.explanation
+                    : "Tidak ada pembahasan.",
+              };
+            });
 
             setReviewData(review);
 

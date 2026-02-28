@@ -7,13 +7,14 @@ export async function register(req: Request, res: Response) {
 
   try {
     const user = await AuthService.register(name, email, password);
+
     res.status(201).json({
       message: "Register berhasil",
       user: {
-        id: user._id,
+        id: user.id, // ✅ ganti dari _id ke id
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
@@ -27,7 +28,7 @@ export async function login(req: Request, res: Response) {
     const user = await AuthService.login(email, password);
 
     const token = signToken({
-      id: user._id,
+      id: user.id, // ✅ ganti dari _id ke id
       name: user.name,
       email: user.email,
     });
@@ -36,12 +37,11 @@ export async function login(req: Request, res: Response) {
       message: "Login berhasil",
       token,
       user: {
-        id: user._id,
+        id: user.id, // ✅ ganti dari _id ke id
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
-
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }

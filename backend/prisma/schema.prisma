@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+model Question {
+  id            Int      @id @default(autoincrement())
+  room          String
+  type          String   // "pretest" | "posttest"
+  question      String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer Int
+  explanation   String?  // optional
+  createdAt     DateTime @default(now())
+}
+
+model Result {
+  id            Int      @id @default(autoincrement())
+  playerName    String
+  room          String
+  pretestScore  Int
+  posttestScore Int
+  createdAt     DateTime @default(now())
+}
+
+model Video {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  url       String
+  createdAt DateTime @default(now())
+}

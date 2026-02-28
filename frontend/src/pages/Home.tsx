@@ -1,12 +1,24 @@
 import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
 import BgImage from "../assets/background/intro.svg";
 import DialogBox from "../components/DialogueBox";
 import avatar from "../assets/avatar.png";
+
 
 const Home: React.FC = () => {
   const [showNameModal, setShowNameModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [name, setName] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/videos/intro")
+      .then((res) => {
+        if (res.data) setVideoUrl(res.data.url);
+      });
+  }, []);
 
   return (
     <div
@@ -124,7 +136,7 @@ const Home: React.FC = () => {
             <iframe
               width="100%"
               height="500"
-              src="https://www.youtube.com/embed/_WRanc99nUQ?si=W0MntwCtGlmvBSbs"
+              src={videoUrl}
               title="YouTube video"
               allow="autoplay"
               allowFullScreen

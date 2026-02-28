@@ -21,13 +21,20 @@ import Ruang4 from "./pages/admin/Ruang4";
 import Ruang5 from "./pages/admin/Ruang5";
 import Ruang6 from "./pages/admin/Ruang6";
 import Dashboard from "./pages/admin/Dashboard";
+import Room1 from "./pages/admin/soal/Room1";
+import Room2 from "./pages/admin/soal/Room2";
+import Room3 from "./pages/admin/soal/Room3";
+import Room4 from "./pages/admin/soal/Room4";
+import Room5 from "./pages/admin/soal/Room5";
+import Room6 from "./pages/admin/soal/Room6";
+import Video from "./pages/admin/Video";
 
 
 function App() {
   return (
     <BrowserRouter>
-      {/* <SplashCursor /> */}
-      {/* <Backsound /> */}
+      {/* <SplashCursor />
+      <Backsound /> */}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -42,6 +49,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
       </Routes>
+
       {/* Admin Page */}
       <Routes>
         <Route
@@ -100,7 +108,69 @@ function App() {
             </RequireAuth>
           }
         />
+
+        {/* Dropdown Soal */}
+        <Route
+          path="/admin/soal/room-1"
+          element={
+            <RequireAuth>
+              <Room1 />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/soal/room-2"
+          element={
+            <RequireAuth>
+              <Room2 />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/soal/room-3"
+          element={
+            <RequireAuth>
+              <Room3 />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/soal/room-4"
+          element={
+            <RequireAuth>
+              <Room4 />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/soal/room-5"
+          element={
+            <RequireAuth>
+              <Room5 />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/admin/soal/room-6"
+          element={
+            <RequireAuth>
+              <Room6 />
+            </RequireAuth>
+          }
+        />
+        
+        {/* Update Video */}
+        <Route
+          path="/admin/video"
+          element={
+            <RequireAuth>
+              <Video />
+            </RequireAuth>
+          }
+        />
       </Routes>
+
+
 
     </BrowserRouter>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MenuSelection from "../components/MenuSelection";
 import BgImage from "../assets/background/ion.jpeg";
 import IonPuzzleWrapper from "../components/puzzle/IonPuzzleWrapper";
@@ -11,54 +11,19 @@ import Marquee from "../components/Marquee";
 import axios from "axios";
 
 const RoomIon: React.FC = () => {
-
   const [showFinalDialog, setShowFinalDialog] = useState(false);
+  const [pretest, setPretest] = useState<any[]>([]);
+  const [posttest, setPosttest] = useState<any[]>([]);
 
-  const pretest = [
-    {
-      question: "Apa itu ikatan kovalen?",
-      options: [
-        "Ikatan karena serah terima elektron",
-        "Ikatan karena pemakaian bersama elektron",
-        "Ikatan antara ion positif dan negatif",
-        "Ikatan karena gaya magnet",
-      ],
-      correctAnswer: 1,
-
-    },
-    {
-      question: "Ikatan kovalen biasanya terjadi antara...",
-      options: [
-        "Logam dan nonlogam",
-        "Sesama nonlogam",
-        "Sesama logam",
-        "Ion positif dan ion negatif",
-      ],
-      correctAnswer: 1,
-    },
-  ];
-
-  const posttest = [
-    {
-      question: "Mengapa atom membentuk ikatan kovalen?",
-      options: [
-        "Untuk mencapai kestabilan elektron",
-        "Karena gaya tarik inti kuat",
-        "Karena perbedaan muatan",
-        "Karena suhu tinggi",
-      ],
-      correctAnswer: 0,
-      explanation:
-        "Atom membentuk ikatan kovalen untuk mencapai konfigurasi elektron stabil seperti gas mulia.",
-    },
-    {
-      question: "Contoh senyawa dengan ikatan kovalen adalah...",
-      options: ["NaCl", "KBr", "H₂O", "CaO"],
-      correctAnswer: 2,
-      explanation:
-        "H₂O merupakan senyawa kovalen karena terbentuk dari sesama nonlogam yang berbagi elektron.",
-    },
-  ];
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/questions/ion")
+      .then((res) => {
+        setPretest(res.data.pretest);
+        setPosttest(res.data.posttest);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const playerName = localStorage.getItem("playerName");
 
@@ -81,9 +46,6 @@ const RoomIon: React.FC = () => {
 
     axios.post("http://localhost:5000/api/results", payload);
   }
-
-
-
 
   return (
     <div

@@ -10,12 +10,16 @@ import { TbTopologyStar3 } from "react-icons/tb";
 import { BiAtom, BiMove } from "react-icons/bi";
 import { FiLink } from "react-icons/fi";
 import { GiMagnet, GiMetalBar } from "react-icons/gi";
+import { FaRegListAlt } from "react-icons/fa";
+import { FaRegCircleDot } from "react-icons/fa6";
+import { RiVideoAddFill } from "react-icons/ri";
 
 
 interface MenuItem {
   label: string;
-  path: string;
+  path?: string;
   icon: ReactNode;
+  children?: MenuItem[];
 }
 
 const menuItems: MenuItem[] = [
@@ -26,10 +30,24 @@ const menuItems: MenuItem[] = [
   { label: "Ruang Lewis", path: "/admin/ruang-4", icon: <TbTopologyStar3 size={22} /> },
   { label: "Ruang Logam", path: "/admin/ruang-5", icon: <GiMetalBar size={22} /> },
   { label: "Ruang Gaya", path: "/admin/ruang-6", icon: <BiMove size={22} /> },
+  {
+    label: "Soal",
+    icon: <FaRegListAlt size={22} />,
+    children: [
+      { label: "Room 1", path: "/admin/soal/room-1", icon: <FaRegCircleDot size={18} /> },
+      { label: "Room 2", path: "/admin/soal/room-2", icon: <FaRegCircleDot size={18} /> },
+      { label: "Room 3", path: "/admin/soal/room-3", icon: <FaRegCircleDot size={18} /> },
+      { label: "Room 4", path: "/admin/soal/room-4", icon: <FaRegCircleDot size={18} /> },
+      { label: "Room 5", path: "/admin/soal/room-5", icon: <FaRegCircleDot size={18} /> },
+      { label: "Room 6", path: "/admin/soal/room-6", icon: <FaRegCircleDot size={18} /> },
+    ],
+  },
+  { label: "Video", path: "/admin/video", icon: <RiVideoAddFill size={22} /> },
 ];
 
 const Sidebar = () => {
   const user = getCurrentUser();
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const [avatar, setAvatar] = useState<string>("");
   const [showPopup, setShowPopup] = useState(false);
@@ -49,21 +67,62 @@ const Sidebar = () => {
     <aside className="h-full px-4 py-6 bg-gradient-to-tr from-violet-700 to-violet-950 flex flex-col justify-between">
       <nav className="space-y-2">
         {menuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end
-            className={({ isActive }) =>
-              `flex items-center rounded-lg px-4 py-2 text-sm font-medium transition-all gap-2
+          <div key={item.label}>
+            {!item.children ? (
+              <NavLink
+                to={item.path!}
+                end
+                className={({ isActive }) =>
+                  `flex items-center rounded-lg px-4 py-2 text-sm font-medium gap-2 transition-all
           ${isActive
-                ? "bg-gradient-to-tr from-violet-800 to-blue-500 text-white"
-                : "text-white hover:bg-violet-500/30"
-              }`
-            }
-          >
-            {item.icon}
-            {item.label}
-          </NavLink>
+                    ? "bg-gradient-to-tr from-violet-800 to-blue-500 text-white"
+                    : "text-white hover:bg-violet-500/30"
+                  }`
+                }
+              >
+                {item.icon}
+                {item.label}
+              </NavLink>
+            ) : (
+              <>
+                {/* Parent Soal */}
+                <button
+                  onClick={() =>
+                    setOpenDropdown(openDropdown === item.label ? null : item.label)
+                  }
+                  className="w-full flex items-center justify-between rounded-lg px-4 py-2 text-sm font-medium text-white hover:bg-violet-500/30 transition"
+                >
+                  <div className="flex items-center gap-2">
+                    {item.icon}
+                    {item.label}
+                  </div>
+                  <span>{openDropdown === item.label ? "▲" : "▼"}</span>
+                </button>
+
+                {/* Dropdown Items */}
+                {openDropdown === item.label && (
+                  <div className="ml-6 mt-1 space-y-1">
+                    {item.children.map((child) => (
+                      <NavLink
+                        key={child.path}
+                        to={child.path!}
+                        className={({ isActive }) =>
+                          `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition
+                  ${isActive
+                            ? "bg-violet-800 text-white"
+                            : "text-white hover:bg-violet-500/30"
+                          }`
+                        }
+                      >
+                        {child.icon}
+                        {child.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         ))}
       </nav>
 
