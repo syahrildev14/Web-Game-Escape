@@ -15,7 +15,7 @@
 - JWT Authentication
 
 **Database**
-- MongoDB
+- MySql
 
 ---
 
