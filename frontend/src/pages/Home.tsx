@@ -93,7 +93,16 @@ const Home: React.FC = () => {
       {/* MODAL INPUT NAMA */}
       {showNameModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl shadow-xl space-y-4 w-80">
+          <div className="relative bg-white p-6 rounded-xl shadow-xl space-y-4 w-80">
+
+            {/* Tombol Close */}
+            <button
+              onClick={() => setShowNameModal(false)}
+              className="absolute top-3 right-3 text-white text-xl z-50 w-10 h-10 rounded-full bg-violet-500 hover:scale-105 duration-200 shadow-lg shadow-black/40"
+            >
+              ✕
+            </button>
+
             <h2 className="text-lg font-semibold text-center text-black">
               Masukkan Nama
             </h2>

@@ -9,7 +9,7 @@ import RoomGaya from "./pages/RoomGaya";
 import Final from "./pages/Final";
 import Refleksi from "./pages/Refleksi";
 // import SplashCursor from "./components/SplashCursor";
-// import Backsound from "./components/Backsound";
+import Backsound from "./components/Backsound";
 // Admin
 import LoginPage from "./pages/auth/Login";
 import RegisterPage from "./pages/auth/Register";
@@ -33,8 +33,8 @@ import Video from "./pages/admin/Video";
 function App() {
   return (
     <BrowserRouter>
-      {/* <SplashCursor />
-      <Backsound /> */}
+      {/* <SplashCursor /> */}
+      <Backsound />
 
       <Routes>
         <Route path="/" element={<Home />} />
