@@ -3,7 +3,7 @@ import axios from "axios";
 import AdminLayout from "../../../admin-layout/AdminLayout";
 
 interface Question {
-  _id?: string;
+  id: number;
   room: string;
   type: "pretest" | "posttest";
   question: string;
@@ -12,10 +12,19 @@ interface Question {
   explanation: string;
 }
 
-const Room2 = () => {
+interface QuestionForm {
+  room: string;
+  type: "pretest" | "posttest";
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
+
+const Room4 = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
 
-  const [form, setForm] = useState<Question>({
+  const [form, setForm] = useState<QuestionForm>({
     room: "lewis",
     type: "pretest",
     question: "",
@@ -80,7 +89,7 @@ const Room2 = () => {
   // =============================
   // DELETE
   // =============================
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     await axios.delete(`http://localhost:5000/api/questions/${id}`);
     fetchQuestions();
   };
@@ -160,7 +169,7 @@ const Room2 = () => {
           {/* 🔥 EXPLANATION SELALU ADA */}
           <div>
             <label className="font-semibold">
-              Penjelasan Jawaban Benar
+              Explanation (Opsional untuk Postest)
             </label>
             <textarea
               name="explanation"
@@ -185,7 +194,7 @@ const Room2 = () => {
         <div className="space-y-4">
           {questions.map((q) => (
             <div
-              key={q._id}
+              key={q.id}
               className="bg-white p-4 rounded shadow"
             >
               <div className="flex justify-between items-start">
@@ -216,7 +225,7 @@ const Room2 = () => {
                 </div>
 
                 <button
-                  onClick={() => handleDelete(q._id!)}
+                  onClick={() => handleDelete(q.id)}
                   className="text-red-600 hover:underline"
                 >
                   Hapus
@@ -230,4 +239,4 @@ const Room2 = () => {
   );
 };
 
-export default Room2;
+export default Room4;

@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import db from "../config/db";
 import bcrypt from "bcrypt";
-
-const prisma = new PrismaClient();
 
 // ============================
 // REGISTER
@@ -12,9 +10,12 @@ export async function register(
   password: string
 ) {
   // cek apakah email sudah ada
-  const exist = await prisma.user.findUnique({
-    where: { email },
-  });
+  const [rows] = await db.query(
+    "SELECT * FROM users WHERE email = ? LIMIT 1",
+    [email]
+  );
+
+  const exist = (rows as any[])[0];
 
   if (exist) {
     throw new Error("Email sudah digunakan");
@@ -22,24 +23,28 @@ export async function register(
 
   const hash = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hash,
-    },
-  });
+  const [result] = await db.query(
+    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+    [name, email, hash]
+  );
 
-  return user;
+  return {
+    id: (result as any).insertId,
+    name,
+    email,
+  };
 }
 
 // ============================
 // LOGIN
 // ============================
 export async function login(email: string, password: string) {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
+  const [rows] = await db.query(
+    "SELECT * FROM users WHERE email = ? LIMIT 1",
+    [email]
+  );
+
+  const user = (rows as any[])[0];
 
   if (!user) {
     throw new Error("User tidak ditemukan");

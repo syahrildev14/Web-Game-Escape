@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import db from "../config/db";
 
 // ============================
 // SAVE RESULT
@@ -15,18 +13,28 @@ export async function saveResult(req: Request, res: Response) {
       posttestScore,
     } = req.body;
 
-    const saved = await prisma.result.create({
-      data: {
+    const [result] = await db.query(
+      `INSERT INTO results 
+      (playerName, room, pretestScore, posttestScore) 
+      VALUES (?, ?, ?, ?)`,
+      [
         playerName,
         room,
-        pretestScore: Number(pretestScore),
-        posttestScore: Number(posttestScore),
-      },
+        Number(pretestScore),
+        Number(posttestScore),
+      ]
+    );
+
+    res.status(201).json({
+      id: (result as any).insertId,
+      playerName,
+      room,
+      pretestScore: Number(pretestScore),
+      posttestScore: Number(posttestScore),
     });
 
-    res.status(201).json(saved);
-
   } catch (err: any) {
+    console.error(err);
     res.status(400).json({ message: err.message });
   }
 }
@@ -38,14 +46,17 @@ export async function getResultsByRoom(req: Request, res: Response) {
   try {
     const { room } = req.params;
 
-    const results = await prisma.result.findMany({
-      where: { room },
-      orderBy: { createdAt: "desc" },
-    });
+    const [rows] = await db.query(
+      `SELECT * FROM results 
+       WHERE room = ? 
+       ORDER BY createdAt DESC`,
+      [room]
+    );
 
-    res.json(results);
+    res.json(rows);
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Gagal mengambil data" });
   }
 }
@@ -57,13 +68,33 @@ export async function deleteResult(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
-    await prisma.result.delete({
-      where: { id: Number(id) },
-    });
+    await db.query(
+      "DELETE FROM results WHERE id = ?",
+      [Number(id)]
+    );
 
     return res.json({ message: "Data berhasil dihapus" });
 
   } catch (err: any) {
+    console.error(err);
+    return res.status(500).json({ message: "Terjadi kesalahan server" });
+  }
+}
+
+export async function deleteResult(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    console.log("DELETE ID:", id);
+
+    await db.query(
+      "DELETE FROM results WHERE id = ?",
+      [Number(id)]
+    );
+
+    return res.json({ message: "Data berhasil dihapus" });
+
+  } catch (err: any) {
+    console.error("DELETE ERROR:", err);
     return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 }

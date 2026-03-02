@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import db from "../config/db";
 
 // ============================
 // GET soal berdasarkan room
@@ -10,13 +8,15 @@ export const getQuestionsByRoom = async (req: Request, res: Response) => {
   const { room } = req.params;
 
   try {
-    const pretest = await prisma.question.findMany({
-      where: { room, type: "pretest" },
-    });
+    const [rows] = await db.query(
+      "SELECT * FROM questions WHERE room = ?",
+      [room]
+    );
 
-    const posttest = await prisma.question.findMany({
-      where: { room, type: "posttest" },
-    });
+    const questions = rows as any[];
+
+    const pretest = questions.filter((q) => q.type === "pretest");
+    const posttest = questions.filter((q) => q.type === "posttest");
 
     const format = (data: any[]) =>
       data.map((q) => ({
@@ -35,6 +35,7 @@ export const getQuestionsByRoom = async (req: Request, res: Response) => {
     });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Gagal mengambil soal" });
   }
 };
@@ -53,23 +54,35 @@ export const createQuestion = async (req: Request, res: Response) => {
       explanation,
     } = req.body;
 
-    const newQuestion = await prisma.question.create({
-      data: {
+    const [result] = await db.query(
+      `INSERT INTO questions 
+      (room, type, question, optionA, optionB, optionC, optionD, correctAnswer, explanation)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
         room,
         type,
         question,
-        optionA: options[0],
-        optionB: options[1],
-        optionC: options[2],
-        optionD: options[3],
-        correctAnswer: Number(correctAnswer),
-        explanation: explanation || "",
-      },
+        options[0],
+        options[1],
+        options[2],
+        options[3],
+        Number(correctAnswer),
+        explanation || "",
+      ]
+    );
+
+    res.status(201).json({
+      id: (result as any).insertId,
+      room,
+      type,
+      question,
+      options,
+      correctAnswer: Number(correctAnswer),
+      explanation: explanation || "",
     });
 
-    res.status(201).json(newQuestion);
-
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Gagal menambahkan soal" });
   }
 };
@@ -88,24 +101,36 @@ export const updateQuestion = async (req: Request, res: Response) => {
       explanation,
     } = req.body;
 
-    const updated = await prisma.question.update({
-      where: { id: Number(req.params.id) },
-      data: {
+    await db.query(
+      `UPDATE questions SET 
+        room=?, 
+        type=?, 
+        question=?, 
+        optionA=?, 
+        optionB=?, 
+        optionC=?, 
+        optionD=?, 
+        correctAnswer=?, 
+        explanation=? 
+      WHERE id=?`,
+      [
         room,
         type,
         question,
-        optionA: options[0],
-        optionB: options[1],
-        optionC: options[2],
-        optionD: options[3],
-        correctAnswer: Number(correctAnswer),
-        explanation: explanation || "",
-      },
-    });
+        options[0],
+        options[1],
+        options[2],
+        options[3],
+        Number(correctAnswer),
+        explanation || "",
+        Number(req.params.id),
+      ]
+    );
 
-    res.json(updated);
+    res.json({ message: "Soal berhasil diupdate" });
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Gagal update soal" });
   }
 };
@@ -115,13 +140,15 @@ export const updateQuestion = async (req: Request, res: Response) => {
 // ============================
 export const deleteQuestion = async (req: Request, res: Response) => {
   try {
-    await prisma.question.delete({
-      where: { id: Number(req.params.id) },
-    });
+    await db.query(
+      "DELETE FROM questions WHERE id = ?",
+      [Number(req.params.id)]
+    );
 
     res.json({ message: "Soal dihapus" });
 
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Gagal hapus soal" });
   }
 };

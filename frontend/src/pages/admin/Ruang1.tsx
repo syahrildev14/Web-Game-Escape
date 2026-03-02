@@ -190,7 +190,7 @@ const Ruang1 = () => {
                 <td className="px-3 py-2 flex justify-center items-center">
                   <button
                     className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 flex items-center gap-2"
-                    onClick={() => handleDelete((row as any)._id)}
+                    onClick={() => handleDelete((row as any).id)}
                   >
                     Delete <RiDeleteBinFill />
                   </button>
