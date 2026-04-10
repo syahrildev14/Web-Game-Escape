@@ -51,25 +51,38 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
     score: number;
   } | null>(null);
 
+  const isPretestDone = !!pretestResult;
+  const isPosttestDone = !!posttestResult;
+
   return (
     <div className="w-screen h-screen flex justify-center items-center relative">
       <div className="flex flex-col items-center gap-12">
+
         {/* Puzzle */}
         <motion.div
-          onClick={() => setShowPuzzle(true)}
-          className="cursor-pointer flex flex-col items-center"
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            if (!isPosttestDone) return;
+            setShowPuzzle(true);
+          }}
+          className={`flex flex-col items-center ${isPosttestDone
+              ? "cursor-pointer"
+              : "cursor-not-allowed opacity-50"
+            }`}
+          whileHover={isPosttestDone ? { scale: 1.15 } : {}}
+          whileTap={isPosttestDone ? { scale: 0.95 } : {}}
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 2, repeat: Infinity, repeatType: "loop" }}
         >
           <div className="w-32 h-32 rounded-full bg-white border-4 border-violet-600 flex justify-center items-center shadow-lg">
             <img src={pazzleImg} className="w-16" />
           </div>
-          <p className="text-white text-lg font-semibold mt-2">Puzzle</p>
+          <p className="text-white text-lg font-semibold mt-2">
+            Puzzle {!isPosttestDone && "🔒"}
+          </p>
         </motion.div>
 
         <div className="flex gap-24">
+
           {/* Pretest */}
           <motion.div
             onClick={() => setShowPre(true)}
@@ -77,28 +90,49 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
             whileHover={{ scale: 1.12 }}
             whileTap={{ scale: 0.95 }}
             animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatType: "loop", delay: 0.4 }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              repeatType: "loop",
+              delay: 0.4,
+            }}
           >
             <div className="w-32 h-32 rounded-full bg-white border-4 border-violet-600 flex justify-center items-center shadow-lg">
               <img src={preImg} className="w-14" />
             </div>
-            <p className="text-white text-lg font-semibold mt-2">Pre-Test</p>
+            <p className="text-white text-lg font-semibold mt-2">
+              Pre-Test
+            </p>
           </motion.div>
 
           {/* Posttest */}
           <motion.div
-            onClick={() => setShowPost(true)}
-            className="cursor-pointer flex flex-col items-center"
-            whileHover={{ scale: 1.12 }}
-            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              if (!isPretestDone) return;
+              setShowPost(true);
+            }}
+            className={`flex flex-col items-center ${isPretestDone
+                ? "cursor-pointer"
+                : "cursor-not-allowed opacity-50"
+              }`}
+            whileHover={isPretestDone ? { scale: 1.12 } : {}}
+            whileTap={isPretestDone ? { scale: 0.95 } : {}}
             animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatType: "loop", delay: 0.4 }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              repeatType: "loop",
+              delay: 0.4,
+            }}
           >
             <div className="w-32 h-32 rounded-full bg-white border-4 border-violet-600 flex justify-center items-center shadow-lg">
               <img src={postImg} className="w-14" />
             </div>
-            <p className="text-white text-lg font-semibold mt-2">Post-Test</p>
+            <p className="text-white text-lg font-semibold mt-2">
+              Post-Test {!isPretestDone && "🔒"}
+            </p>
           </motion.div>
+
         </div>
       </div>
 
@@ -110,7 +144,6 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
           onSubmit={(data) => {
             setPretestResult(data);
 
-            // 🔥 TAMBAHKAN REVIEW DATA DI SINI
             const review = pretestQuestions.map((q, index) => {
               const userAnswerIndex = data.answers[index];
 
@@ -126,8 +159,13 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
             });
 
             setReviewData(review);
-
             setResult({ title: "Pre-test Selesai", score: data.score });
+
+            // ✅ AUTO LANJUT KE POSTTEST
+            setShowPre(false);
+            setTimeout(() => {
+              setShowPost(true);
+            }, 800);
           }}
           onClose={() => setShowPre(false)}
         />
@@ -141,7 +179,6 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
           onSubmit={(data) => {
             setPosttestResult(data);
 
-            // 🔥 BUAT REVIEW DATA DI SINI
             const review = posttestQuestions.map((q, index) => {
               const userAnswerIndex = data.answers[index];
 
@@ -157,7 +194,6 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
             });
 
             setReviewData(review);
-
             setResult({ title: "Post-test Selesai", score: data.score });
 
             if (pretestResult && onFinish) {
@@ -192,10 +228,15 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
       {pretestResult && posttestResult && (
         <div className="absolute bottom-8 left-8 bg-white/90 px-6 py-4 rounded-xl shadow-lg">
           <p className="font-bold text-lg mb-2">📊 Evaluasi</p>
-          <p>Pre-Test : <b>{pretestResult.score}</b></p>
-          <p>Post-Test: <b>{posttestResult.score}</b></p>
+          <p>
+            Pre-Test : <b>{pretestResult.score}</b>
+          </p>
+          <p>
+            Post-Test: <b>{posttestResult.score}</b>
+          </p>
           <p className="mt-1">
-            Peningkatan: <b>{posttestResult.score - pretestResult.score}</b>
+            Peningkatan:{" "}
+            <b>{posttestResult.score - pretestResult.score}</b>
           </p>
         </div>
       )}
