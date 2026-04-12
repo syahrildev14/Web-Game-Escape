@@ -9,8 +9,14 @@ export default class MetalPuzzle extends Phaser.Scene {
   private correct = 0;
   private total = 4;
 
+  private roomCode: string = "METAL-005";
+
   constructor() {
     super("MetalPuzzle");
+  }
+
+  init(data: any) {
+    this.roomCode = data?.roomCode || "METAL-005";
   }
 
   preload(): void {
@@ -21,10 +27,12 @@ export default class MetalPuzzle extends Phaser.Scene {
   }
 
   create(): void {
-    /** 🪙 Background metalik */
+    this.correct = 0;
+
+    /** 🪙 Background */
     this.add.image(400, 300, "bg").setDisplaySize(800, 600);
 
-    /** 🌊 Lautan elektron (animasi) */
+    /** 🌊 Electron sea animation */
     const sea = this.add
       .image(400, 330, "sea")
       .setAlpha(0.4)
@@ -40,22 +48,20 @@ export default class MetalPuzzle extends Phaser.Scene {
     });
 
     /** 🧠 Narasi */
-    this.add
-      .text(
-        400,
-        30,
-        "“Ikatan logam bergantung pada lautan elektron delokalisasi.\nAtur kembali kisi logam ini!” — Dr. Ion",
-        {
-          fontSize: "20px",
-          color: "#d0f4ff",
-          align: "center",
-          fontFamily: "Poppins",
-          wordWrap: { width: 720 },
-        }
-      )
-      .setOrigin(0.5, 0);
+    this.add.text(
+      400,
+      30,
+      "Ikatan logam bergantung pada lautan elektron delokalisasi.\nAtur kembali kisi logam ini!",
+      {
+        fontSize: "20px",
+        color: "#d0f4ff",
+        align: "center",
+        fontFamily: "Poppins",
+        wordWrap: { width: 720 },
+      }
+    ).setOrigin(0.5);
 
-    /** SLOT KONSEP */
+    /** SLOT */
     const slots = [
       this.createSlot(520, 180, "Konduktivitas listrik"),
       this.createSlot(520, 260, "Konduktivitas panas"),
@@ -63,7 +69,7 @@ export default class MetalPuzzle extends Phaser.Scene {
       this.createSlot(520, 420, "Dapat ditarik"),
     ];
 
-    /** KARTU SIFAT */
+    /** CARD DATA */
     const cards = [
       { text: "Elektron bebas bergerak", accept: 0 },
       { text: "Energi mudah berpindah", accept: 1 },
@@ -79,7 +85,6 @@ export default class MetalPuzzle extends Phaser.Scene {
   /** SLOT */
   private createSlot(x: number, y: number, label: string) {
     const slot = this.add.image(x, y, "slot");
-    slot.setData("index", label);
 
     this.add.text(x, y, label, {
       fontSize: "14px",
@@ -100,8 +105,6 @@ export default class MetalPuzzle extends Phaser.Scene {
     slots: Phaser.GameObjects.Image[]
   ) {
     const card = this.add.image(x, y, "card").setInteractive();
-    card.setData("accept", acceptIndex);
-
     const label = this.add.text(x, y, text, {
       fontSize: "14px",
       color: "#000",
@@ -109,44 +112,44 @@ export default class MetalPuzzle extends Phaser.Scene {
       wordWrap: { width: 120 },
     }).setOrigin(0.5);
 
+    card.setData("accept", acceptIndex);
+
     this.input.setDraggable(card);
 
-    this.input.on(
-      "drag",
-      (
-        _p: Phaser.Input.Pointer,
-        target: Phaser.GameObjects.Image,
-        dragX: number,
-        dragY: number
-      ) => {
-        if (target === card) {
-          target.setPosition(dragX, dragY);
-          label.setPosition(dragX, dragY);
+    this.input.on("drag", (_p, target: any, dragX, dragY) => {
+      if (target !== card) return;
+      card.setPosition(dragX, dragY);
+      label.setPosition(dragX, dragY);
+    });
+
+    this.input.on("dragend", (_p, target: any) => {
+      if (target !== card) return;
+
+      let matched = false;
+
+      slots.forEach((slot, index) => {
+        if (
+          Phaser.Math.Distance.Between(card.x, card.y, slot.x, slot.y) < 60 &&
+          card.getData("accept") === index
+        ) {
+          card.disableInteractive();
+          card.setPosition(slot.x, slot.y);
+          label.setPosition(slot.x, slot.y);
+
+          this.markCorrect();
+          matched = true;
         }
-      }
-    );
+      });
 
-    this.input.on(
-      "dragend",
-      (
-        _p: Phaser.Input.Pointer,
-        target: Phaser.GameObjects.Image
-      ) => {
-        if (target !== card) return;
-
-        slots.forEach((slot, index) => {
-          if (
-            Phaser.Math.Distance.Between(card.x, card.y, slot.x, slot.y) < 60 &&
-            card.getData("accept") === index
-          ) {
-            card.disableInteractive();
-            card.setPosition(slot.x, slot.y);
-            label.setPosition(slot.x, slot.y);
-            this.markCorrect();
-          }
+      if (!matched) {
+        this.tweens.add({
+          targets: [card, label],
+          y: y,
+          duration: 300,
+          ease: "Back.easeOut",
         });
       }
-    );
+    });
   }
 
   /** ✔️ CHECK */
@@ -157,15 +160,14 @@ export default class MetalPuzzle extends Phaser.Scene {
 
   /** 🔐 FINISH */
   private finishPuzzle() {
-    this.add
-      .text(400, 560, "Kisi Logam Stabil!\nCode: 5", {
-        fontSize: "28px",
-        color: "#00fff2",
-        align: "center",
-        fontFamily: "Poppins",
-      })
-      .setOrigin(0.5);
+    this.add.text(400, 560, `Kisi Logam Stabil!\nCode: ${this.roomCode}`, {
+      fontSize: "28px",
+      color: "#00fff2",
+      align: "center",
+      fontFamily: "Poppins",
+    }).setOrigin(0.5);
 
-    this.events.emit("puzzleCompleted", "Code: 5");
+    // 🔥 EVENT UNTUK REACT / ZUSTAND
+    this.game.events.emit("puzzleCompleted", this.roomCode);
   }
 }

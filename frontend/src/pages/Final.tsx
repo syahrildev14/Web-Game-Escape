@@ -1,40 +1,88 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useGameStore } from "../store/useGameStore";
 
 import bgOff from "../assets/background/rusak.jpeg";
 import bgOn from "../assets/background/good.jpeg";
 import { motion } from "framer-motion";
 
 const TOTAL_PUZZLES = 6;
-const FINAL_CODE = "123456";
 
 export default function StabilizerInputPage() {
   const navigate = useNavigate();
 
-  const [codes, setCodes] = useState<string[]>(Array(TOTAL_PUZZLES).fill(""));
+  const { codes: roomCodes, fetchCodes } = useGameStore();
+
+  const [codes, setCodes] = useState<string[]>(
+    Array(TOTAL_PUZZLES).fill("")
+  );
+
   const [error, setError] = useState<string | null>(null);
-  const [activated, setActivated] = useState(false);
+  const [activated, setActivated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // 🔥 FETCH KODE DARI BACKEND
+  useEffect(() => {
+    fetchCodes();
+  }, []);
+
+  // 🔥 AUTO ISI DARI ROOM (DINAMIS)
+  useEffect(() => {
+    if (!roomCodes) return;
+
+    const newCodes = [
+      roomCodes.room1 || "",
+      roomCodes.room2 || "",
+      roomCodes.room3 || "",
+      roomCodes.room4 || "",
+      roomCodes.room5 || "",
+      roomCodes.room6 || "",
+    ];
+
+    setCodes(newCodes);
+  }, [roomCodes]);
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d?$/.test(value)) return;
+
     const next = [...codes];
     next[index] = value;
     setCodes(next);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (): Promise<void> => {
     if (codes.some((c) => c === "")) {
       setError("Semua kode harus diisi");
       return;
     }
 
     const finalCode = codes.join("");
+    setLoading(true);
 
-    if (finalCode === FINAL_CODE) {
-      setError(null);
-      setActivated(true);
-    } else {
-      setError("Kode salah. Stabilizer belum aktif!");
+    try {
+      const res = await fetch(
+        "http://localhost:5000/api/stabilizer/validate-code",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code: finalCode }),
+        }
+      );
+
+      const data: { success: boolean } = await res.json();
+
+      if (data.success) {
+        setError(null);
+        setActivated(true);
+      } else {
+        setError("Kode salah. Stabilizer belum aktif!");
+      }
+    } catch (err) {
+      setError("Server error, coba lagi");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -50,7 +98,6 @@ export default function StabilizerInputPage() {
           Stabilizer Energi
         </h1>
 
-        {/* FORM INPUT */}
         {!activated && (
           <>
             <p className="text-center text-gray-600 mb-6">
@@ -69,18 +116,20 @@ export default function StabilizerInputPage() {
               ))}
             </div>
 
-            {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+            {error && (
+              <p className="text-red-600 text-center mb-4">{error}</p>
+            )}
 
             <button
               onClick={handleSubmit}
-              className="w-full bg-blue-800 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold duration-300"
+              disabled={loading}
+              className="w-full bg-blue-800 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold duration-300 disabled:opacity-50"
             >
-              Aktifkan Stabilizer
+              {loading ? "Memproses..." : "Aktifkan Stabilizer"}
             </button>
           </>
         )}
 
-        {/* DIALOG DR. ION */}
         {activated && (
           <div className="text-center mt-6 animate-fade-in">
             <h2 className="text-xl font-bold text-green-600 mb-4">

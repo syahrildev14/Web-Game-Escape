@@ -13,25 +13,25 @@ export default class IonPuzzle extends Phaser.Scene {
   }
 
   preload(): void {
-    // Gambar
-    this.load.image("na", na); // Na+
-    this.load.image("cl", cl); // Cl-
-    this.load.image("slotPlus", plus); // Kation
-    this.load.image("slotMinus", minus); // Anion
-
-    // Background cahaya biru
+    this.load.image("na", na);
+    this.load.image("cl", cl);
+    this.load.image("slotPlus", plus);
+    this.load.image("slotMinus", minus);
     this.load.image("bgBlue", bgBlue);
   }
 
   create(): void {
-    /** BACKGROUND */
-    this.add.image(400, 300, "bgBlue").setDisplaySize(800, 600).setAlpha(0.6);
+    // BACKGROUND
+    this.add
+      .image(400, 300, "bgBlue")
+      .setDisplaySize(800, 600)
+      .setAlpha(0.6);
 
-    /** TEKS NARASI */
+    // NARASI
     this.add
       .text(
-        400, // x center
-        30, // y position
+        400,
+        30,
         "“Stabilizer Ion hanya aktif jika kamu memahami transfer elektron!” — Dr. Ion",
         {
           fontSize: "20px",
@@ -41,10 +41,10 @@ export default class IonPuzzle extends Phaser.Scene {
           wordWrap: { width: 700 },
         }
       )
-      .setOrigin(0.5, 0) // agar rata tengah
+      .setOrigin(0.5, 0)
       .setDepth(10);
 
-    /** TEKS INSTRUKSI */
+    // INSTRUKSI
     this.add
       .text(400, 90, "Tarik ion ke tempat yang benar!", {
         fontSize: "22px",
@@ -52,25 +52,24 @@ export default class IonPuzzle extends Phaser.Scene {
         color: "#ffffff",
         align: "center",
       })
-      .setOrigin(0.5, 0); // CENTER Text
+      .setOrigin(0.5, 0);
 
-    /** SLOT */
+    // SLOT
     const slotPlus = this.add.image(230, 300, "slotPlus");
     const slotMinus = this.add.image(560, 300, "slotMinus");
 
-    /** ION Na+ */
+    // ION
     const ionNa = this.add
       .image(200, 520, "na")
       .setInteractive()
       .setData("ionType", "plus");
 
-    /** ION Cl- */
     const ionCl = this.add
       .image(600, 520, "cl")
       .setInteractive()
       .setData("ionType", "minus");
 
-    /** ROTATION CHAOTIC */
+    // ANIMASI
     this.tweens.add({
       targets: [ionNa, ionCl],
       angle: { from: -10, to: 10 },
@@ -80,68 +79,54 @@ export default class IonPuzzle extends Phaser.Scene {
       ease: "Sine.easeInOut",
     });
 
-    /** ENABLE DRAG */
-    this.input.setDraggable(ionNa);
-    this.input.setDraggable(ionCl);
+    // DRAG
+    this.input.setDraggable([ionNa, ionCl]);
 
-    /** DRAGGING EVENT */
-    this.input.on(
-      "drag",
-      (
-        _pointer: Phaser.Input.Pointer,
-        obj: Phaser.GameObjects.Image,
-        dragX: number,
-        dragY: number
-      ) => {
-        obj.x = dragX;
-        obj.y = dragY;
+    this.input.on("drag", (_p, obj, x, y) => {
+      obj.x = x;
+      obj.y = y;
+    });
+
+    // DROP CHECK
+    this.input.on("dragend", (_p, obj: any) => {
+      const ionType = obj.getData("ionType");
+
+      const isPlusCorrect =
+        ionType === "plus" &&
+        Phaser.Math.Distance.Between(obj.x, obj.y, slotPlus.x, slotPlus.y) < 80;
+
+      const isMinusCorrect =
+        ionType === "minus" &&
+        Phaser.Math.Distance.Between(obj.x, obj.y, slotMinus.x, slotMinus.y) < 80;
+
+      if (isPlusCorrect || isMinusCorrect) {
+        this.correct(obj);
+      } else {
+        this.resetPosition(obj);
       }
-    );
-
-    /** DROP EVENT */
-    this.input.on(
-      "dragend",
-      (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image) => {
-        const ionType = obj.getData("ionType") as string;
-
-        // KATION (positif)
-        if (
-          ionType === "plus" &&
-          Phaser.Math.Distance.Between(obj.x, obj.y, slotPlus.x, slotPlus.y) <
-            80
-        ) {
-          this.correct(obj);
-        }
-        // ANION (negatif)
-        else if (
-          ionType === "minus" &&
-          Phaser.Math.Distance.Between(obj.x, obj.y, slotMinus.x, slotMinus.y) <
-            80
-        ) {
-          this.correct(obj);
-        }
-        // SALAH
-        else {
-          this.tweens.add({
-            targets: obj,
-            x: ionType === "plus" ? 200 : 600,
-            y: 520,
-            duration: 300,
-            ease: "Back.easeOut",
-          });
-        }
-      }
-    );
+    });
   }
 
-  /** JIKA BENAR */
-  private correct(obj: Phaser.GameObjects.Image) {
+  // ❌ SALAH POSISI
+  private resetPosition(obj: any) {
+    const type = obj.getData("ionType");
+
+    this.tweens.add({
+      targets: obj,
+      x: type === "plus" ? 200 : 600,
+      y: 520,
+      duration: 300,
+      ease: "Back.easeOut",
+    });
+  }
+
+  // ✅ BENAR
+  private correct(obj: any) {
     this.correctCount++;
 
-    obj.setTint(0x00ff00); // efek hijau sukses
+    obj.setTint(0x00ff00);
     obj.disableInteractive();
 
-    // Snap ke slot
     this.tweens.add({
       targets: obj,
       scale: 1.1,
@@ -153,18 +138,22 @@ export default class IonPuzzle extends Phaser.Scene {
     }
   }
 
-  /** PUZZLE SELESAI */
+  // 🎯 SELESAI PUZZLE
   private finishPuzzle() {
     this.add
-      .text(220, 550, "Stabilizer Aktif! Code :1", {
+      .text(220, 550, "Stabilizer Aktif!", {
         fontSize: "20px",
-        color: "#ffff",
+        color: "#ffffff",
       })
       .setDepth(20);
 
-    this.time.delayedCall(1500, () => {
-      // Bisa panggil callback untuk modal tutup, atau event custom
-      this.events.emit("puzzleCompleted", "A");
+    this.time.delayedCall(1200, () => {
+      // 🔥 WAJIB: trigger ke React wrapper
+      window.dispatchEvent(
+        new CustomEvent("puzzleCompleted", {
+          detail: "A", // nanti bisa dari backend / admin
+        })
+      );
     });
   }
 }

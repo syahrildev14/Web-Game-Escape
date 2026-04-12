@@ -7,7 +7,7 @@ import slotImg from "../../assets/kovalen/slot1.svg";
 
 export default class LewisPuzzle extends Phaser.Scene {
   private correctPlaced = 0;
-  private totalElectrons = 4; // contoh: karbon (4 elektron valensi)
+  private totalElectrons = 4;
 
   constructor() {
     super("LewisPuzzle");
@@ -21,15 +21,15 @@ export default class LewisPuzzle extends Phaser.Scene {
   }
 
   create(): void {
-    /** 🌌 Background */
+    // BACKGROUND
     this.add.image(400, 300, "bg").setDisplaySize(800, 600);
 
-    /** 🧪 Narasi */
+    // NARASI
     this.add
       .text(
         400,
         30,
-        "“Atom-atom ini kehilangan strukturnya!\nKembalikan konfigurasi Lewis mereka!” — Dr. Ion",
+        "“Kembalikan struktur Lewis atom ini!” — Dr. Ion",
         {
           fontSize: "20px",
           color: "#c7f3ff",
@@ -40,10 +40,10 @@ export default class LewisPuzzle extends Phaser.Scene {
       )
       .setOrigin(0.5, 0);
 
-    /** ⚛️ Atom */
+    // ATOM CENTER
     this.add.image(400, 320, "carbon").setScale(0.9);
 
-    /** 🎯 Slot Elektron */
+    // SLOT
     const slots = [
       this.createSlot(400, 220),
       this.createSlot(500, 320),
@@ -51,7 +51,7 @@ export default class LewisPuzzle extends Phaser.Scene {
       this.createSlot(300, 320),
     ];
 
-    /** ⭐ Elektron Acak */
+    // ELECTRONS
     for (let i = 0; i < this.totalElectrons; i++) {
       this.createElectron(
         Phaser.Math.Between(100, 700),
@@ -61,14 +61,14 @@ export default class LewisPuzzle extends Phaser.Scene {
     }
   }
 
-  /** SLOT */
+  // ================= SLOT =================
   private createSlot(x: number, y: number) {
     const slot = this.add.image(x, y, "slot").setAlpha(0.4);
     slot.setData("filled", false);
     return slot;
   }
 
-  /** ELEKTRON */
+  // ================= ELECTRON =================
   private createElectron(
     x: number,
     y: number,
@@ -79,52 +79,42 @@ export default class LewisPuzzle extends Phaser.Scene {
 
     this.input.setDraggable(dot);
 
-    this.input.on(
-      "drag",
-      (
-        _p: Phaser.Input.Pointer,
-        target: Phaser.GameObjects.Image,
-        dragX: number,
-        dragY: number
-      ) => {
-        if (target === dot) {
-          target.x = dragX;
-          target.y = dragY;
+    this.input.on("drag", (_p, target, dx, dy) => {
+      if (target === dot) {
+        target.x = dx;
+        target.y = dy;
+      }
+    });
+
+    this.input.on("dragend", (_p, target) => {
+      if (target !== dot) return;
+
+      for (const slot of slots) {
+        if (
+          !slot.getData("filled") &&
+          Phaser.Math.Distance.Between(dot.x, dot.y, slot.x, slot.y) < 40
+        ) {
+          dot.disableInteractive();
+          dot.setPosition(slot.x, slot.y);
+          slot.setData("filled", true);
+
+          this.markCorrect();
+          return;
         }
       }
-    );
 
-    this.input.on(
-      "dragend",
-      (_p: Phaser.Input.Pointer, target: Phaser.GameObjects.Image) => {
-        if (target !== dot) return;
-
-        for (const slot of slots) {
-          if (
-            !slot.getData("filled") &&
-            Phaser.Math.Distance.Between(dot.x, dot.y, slot.x, slot.y) < 40
-          ) {
-            dot.disableInteractive();
-            dot.setPosition(slot.x, slot.y);
-            slot.setData("filled", true);
-            this.markCorrect();
-            return;
-          }
-        }
-
-        // Salah → balik
-        this.tweens.add({
-          targets: dot,
-          x,
-          y,
-          duration: 300,
-          ease: "Back.easeOut",
-        });
-      }
-    );
+      // kembali posisi
+      this.tweens.add({
+        targets: dot,
+        x,
+        y,
+        duration: 300,
+        ease: "Back.easeOut",
+      });
+    });
   }
 
-  /** ✔️ CEK SELESAI */
+  // ================= PROGRESS =================
   private markCorrect() {
     this.correctPlaced++;
 
@@ -133,17 +123,23 @@ export default class LewisPuzzle extends Phaser.Scene {
     }
   }
 
-  /** 🔐 SELESAI */
+  // ================= FINISH =================
   private finishPuzzle() {
     this.add
-      .text(400, 560, "Struktur Lewis Lengkap!\nCode: 4", {
+      .text(400, 560, "Struktur Lewis Lengkap!", {
         fontSize: "28px",
         color: "#00ffd5",
         fontFamily: "Poppins",
-        align: "center",
       })
       .setOrigin(0.5);
 
-    this.events.emit("puzzleCompleted", "L");
+    this.time.delayedCall(1200, () => {
+      // 🔥 FIX: konsisten dengan wrapper kamu
+      window.dispatchEvent(
+        new CustomEvent("puzzleCompleted", {
+          detail: "L",
+        })
+      );
+    });
   }
 }

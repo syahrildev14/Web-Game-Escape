@@ -7,6 +7,7 @@ import videoRoutes from "./routes/videoRoutes";
 import roomRoutes from "./routes/room.route";
 import resultRoutes from "./routes/result.route";
 import authRoutes from "./routes/auth.route";
+import stabilizerRoutes from "./routes/stabilizer.route";
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/api/videos", videoRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/results", resultRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/stabilizer", stabilizerRoutes);
 
 // ===============================
 // HEALTH CHECK
@@ -70,5 +72,7 @@ app.use((err: any, req: any, res: any, next: any) => {
         message: "Internal Server Error",
     });
 });
+
+app.use("/api/stabilizer", stabilizerRoutes);
 
 export default app;

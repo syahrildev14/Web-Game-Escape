@@ -43,6 +43,7 @@ const menuItems: MenuItem[] = [
     ],
   },
   { label: "Video", path: "/admin/video", icon: <RiVideoAddFill size={22} /> },
+  { label: "Final", path: "/admin/final", icon: <RiVideoAddFill size={22} /> },
 ];
 
 const Sidebar = () => {

@@ -31,15 +31,15 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
   }
 
   create(): void {
-    /** Background redup */
+    // BACKGROUND
     this.add.image(400, 300, "bg").setDisplaySize(800, 600).setAlpha(0.7);
 
-    /** Narasi */
+    // NARASI
     this.add
       .text(
         400,
         30,
-        "“Ikatan kovalen terbentuk saat atom berbagi elektron.\nPecahkan pola-pola ini!” — Dr. Ion",
+        "“Ikatan kovalen terbentuk saat atom berbagi elektron.”",
         {
           fontSize: "20px",
           color: "#b9eaff",
@@ -51,35 +51,33 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     this.add
-      .text(400, 90, "Cocokkan molekul → jenis ikatan & pasangan elektron", {
+      .text(400, 90, "Cocokkan molekul → jenis ikatan & elektron", {
         fontSize: "22px",
         color: "#ffffff",
       })
       .setOrigin(0.5, 0);
 
-    /** Molekul (draggable) */
+    // MOLEKUL
     this.createDraggable(150, 500, "h2", "H2");
     this.createDraggable(400, 500, "o2", "O2");
     this.createDraggable(650, 500, "co2", "CO2");
 
-    /** Slot ikatan */
+    // SLOT
     this.createSlot(200, 260, "single", "H2");
     this.createSlot(400, 260, "double", "O2/CO2");
 
-    /** Slot pasangan elektron */
     this.createSlot(260, 160, "e1", "H2");
     this.createSlot(540, 160, "e2", "O2/CO2");
   }
 
-  // ================= UTILITIES =================
-
+  // ================= DRAG OBJECT =================
   private createDraggable(x: number, y: number, key: string, tag: string) {
     const obj = this.add.image(x, y, key).setInteractive();
+
     obj.setData("tag", tag);
     obj.setData("startX", x);
     obj.setData("startY", y);
 
-    // animasi putar pelan
     this.tweens.add({
       targets: obj,
       angle: { from: -6, to: 6 },
@@ -91,46 +89,37 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
 
     this.input.setDraggable(obj);
 
-    this.input.on(
-      "drag",
-      (
-        _p: Phaser.Input.Pointer,
-        target: Phaser.GameObjects.Image,
-        dragX: number,
-        dragY: number
-      ) => {
-        if (target === obj) {
-          target.x = dragX;
-          target.y = dragY;
-        }
+    this.input.on("drag", (_p, target, x, y) => {
+      if (target === obj) {
+        target.x = x;
+        target.y = y;
       }
-    );
+    });
 
-    this.input.on(
-      "dragend",
-      (_p: Phaser.Input.Pointer, target: Phaser.GameObjects.Image) => {
-        this.checkDrop(target);
-      }
-    );
+    this.input.on("dragend", (_p, target) => {
+      this.checkDrop(target as Phaser.GameObjects.Image);
+    });
 
     return obj;
   }
 
+  // ================= SLOT =================
   private createSlot(x: number, y: number, key: string, accept: string) {
     const slot = this.add.image(x, y, key).setAlpha(0.9);
     slot.setData("accept", accept);
     return slot;
   }
 
+  // ================= CHECK =================
   private checkDrop(obj: Phaser.GameObjects.Image) {
-    const tag = obj.getData("tag") as string;
+    const tag = obj.getData("tag");
 
     const slots = this.children
       .getAll()
-      .filter((c) => c.getData("accept")) as Phaser.GameObjects.Image[];
+      .filter((c: any) => c.getData("accept")) as Phaser.GameObjects.Image[];
 
     for (const slot of slots) {
-      const accept = slot.getData("accept") as string;
+      const accept = slot.getData("accept");
 
       if (
         Phaser.Math.Distance.Between(obj.x, obj.y, slot.x, slot.y) < 60 &&
@@ -141,7 +130,7 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       }
     }
 
-    // salah → kembali ke posisi awal
+    // kembali
     this.tweens.add({
       targets: obj,
       x: obj.getData("startX"),
@@ -151,24 +140,35 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
     });
   }
 
+  // ================= CORRECT =================
   private markCorrect(obj: Phaser.GameObjects.Image) {
     obj.disableInteractive();
     obj.setTint(0x00ff99);
 
     this.correctCount++;
-    if (this.correctCount === 6) this.finishPuzzle();
+
+    if (this.correctCount === 6) {
+      this.finishPuzzle();
+    }
   }
 
+  // ================= FINISH =================
   private finishPuzzle() {
     this.add
-      .text(400, 560, "🔐 Puzzle Selesai!\nKode: B", {
+      .text(400, 560, "Puzzle Selesai!", {
         fontSize: "26px",
         color: "#00ffea",
-        align: "center",
         fontFamily: "Poppins",
       })
       .setOrigin(0.5);
 
-    this.events.emit("puzzleCompleted", "Code: 2");
+    this.time.delayedCall(1200, () => {
+      // 🔥 FIX: konsisten dengan wrapper kamu
+      window.dispatchEvent(
+        new CustomEvent("puzzleCompleted", {
+          detail: "B",
+        })
+      );
+    });
   }
 }

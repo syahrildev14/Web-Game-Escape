@@ -28,13 +28,14 @@ import Room4 from "./pages/admin/soal/Room4";
 import Room5 from "./pages/admin/soal/Room5";
 import Room6 from "./pages/admin/soal/Room6";
 import Video from "./pages/admin/Video";
+import FinalKode from "./pages/admin/Final";
 
 
 function App() {
   return (
     <BrowserRouter>
       {/* <SplashCursor /> */}
-      <Backsound />
+      {/* <Backsound /> */}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -165,6 +166,16 @@ function App() {
           element={
             <RequireAuth>
               <Video />
+            </RequireAuth>
+          }
+        />
+
+        {/* Update Final Kode */}
+        <Route
+          path="/admin/final"
+          element={
+            <RequireAuth>
+              <FinalKode />
             </RequireAuth>
           }
         />

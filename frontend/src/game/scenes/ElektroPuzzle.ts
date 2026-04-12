@@ -41,15 +41,15 @@ export default class ElektroPuzzle extends Phaser.Scene {
   }
 
   create(): void {
-    /** Background */
+    // BACKGROUND
     this.add.image(400, 300, "bg").setDisplaySize(800, 600).setAlpha(0.85);
 
-    /** Narasi */
+    // NARASI
     this.add
       .text(
         400,
         20,
-        "“Elektronegativitas menentukan polaritas.\nMana yang lebih menarik elektron?” — Dr. Ion",
+        "“Elektronegativitas menentukan polaritas.”",
         {
           fontSize: "20px",
           color: "#9efcff",
@@ -60,62 +60,57 @@ export default class ElektroPuzzle extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     this.add
-      .text(400, 85, "Seret pasangan atom ke POLAR atau NONPOLAR", {
+      .text(400, 85, "Seret pasangan atom ke POLAR / NONPOLAR", {
         fontSize: "22px",
         color: "#ffffff",
       })
       .setOrigin(0.5);
 
-    /** SLOT */
+    // SLOT
     this.createSlot(250, 400, "polar");
     this.createSlot(550, 400, "nonpolar");
 
-    /** PASANGAN ATOM */
+    // DRAGGABLE
     this.pairs.forEach((pair, index) => {
       this.createDraggable(200 + index * 140, 520, pair);
     });
   }
 
+  // ================= SLOT =================
   private createSlot(x: number, y: number, type: "polar" | "nonpolar") {
     const slot = this.add.image(x, y, type).setAlpha(0.95);
     slot.setData("type", type);
   }
 
+  // ================= DRAG =================
   private createDraggable(x: number, y: number, config: PairConfig) {
     const obj = this.add.image(x, y, config.key).setInteractive();
+
     obj.setData("answer", config.answer);
+    obj.setData("startX", x);
+    obj.setData("startY", y);
 
     this.input.setDraggable(obj);
 
-    this.input.on(
-      "drag",
-      (
-        _: Phaser.Input.Pointer,
-        target: Phaser.GameObjects.Image,
-        dragX: number,
-        dragY: number
-      ) => {
-        if (target === obj) {
-          target.x = dragX;
-          target.y = dragY;
-        }
+    this.input.on("drag", (_p, target, dx, dy) => {
+      if (target === obj) {
+        target.x = dx;
+        target.y = dy;
       }
-    );
+    });
 
-    this.input.on(
-      "dragend",
-      (_: Phaser.Input.Pointer, target: Phaser.GameObjects.Image) => {
-        this.checkDrop(target);
-      }
-    );
+    this.input.on("dragend", (_p, target) => {
+      this.checkDrop(target as Phaser.GameObjects.Image);
+    });
   }
 
+  // ================= CHECK =================
   private checkDrop(obj: Phaser.GameObjects.Image) {
-    const answer = obj.getData("answer") as "polar" | "nonpolar";
+    const answer = obj.getData("answer");
 
     const slots = this.children
       .getAll()
-      .filter((o) => o.getData("type")) as Phaser.GameObjects.Image[];
+      .filter((o: any) => o.getData("type")) as Phaser.GameObjects.Image[];
 
     for (const slot of slots) {
       const type = slot.getData("type");
@@ -131,6 +126,7 @@ export default class ElektroPuzzle extends Phaser.Scene {
     this.resetPosition(obj);
   }
 
+  // ================= CORRECT =================
   private markCorrect(
     obj: Phaser.GameObjects.Image,
     slot: Phaser.GameObjects.Image
@@ -146,24 +142,33 @@ export default class ElektroPuzzle extends Phaser.Scene {
     }
   }
 
+  // ================= RESET =================
   private resetPosition(obj: Phaser.GameObjects.Image) {
     this.tweens.add({
       targets: obj,
-      y: 520,
+      x: obj.getData("startX"),
+      y: obj.getData("startY"),
       duration: 300,
       ease: "Back.easeOut",
     });
   }
 
+  // ================= FINISH =================
   private finishPuzzle() {
     this.add
-      .text(400, 560, "Puzzle Selesai!\nCode: 3", {
+      .text(400, 560, "Puzzle Selesai!", {
         fontSize: "26px",
         color: "#00ffe1",
-        align: "center",
       })
       .setOrigin(0.5);
 
-    this.events.emit("puzzleCompleted", "Code: 3");
+    this.time.delayedCall(1200, () => {
+      // 🔥 FIX: konsisten dengan semua wrapper
+      window.dispatchEvent(
+        new CustomEvent("puzzleCompleted", {
+          detail: "C",
+        })
+      );
+    });
   }
 }

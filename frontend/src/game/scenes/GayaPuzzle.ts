@@ -7,9 +7,9 @@ import hclImg from "../../assets/kovalen/h2.svg";
 import ch4Img from "../../assets/kovalen/h2.svg";
 import o2Img from "../../assets/kovalen/h2.svg";
 
-/* ==================================================
-   INTERMOLECULAR FORCE
-================================================== */
+/* =============================
+   TYPE
+============================= */
 export const IntermolecularForce = {
   HYDROGEN: "hydrogen",
   DIPOLE: "dipole",
@@ -19,9 +19,9 @@ export const IntermolecularForce = {
 export type IntermolecularForce =
   (typeof IntermolecularForce)[keyof typeof IntermolecularForce];
 
-/* ==================================================
-   MOLECULE TYPE
-================================================== */
+/* =============================
+   MOLECULE
+============================= */
 interface MoleculeData {
   key: string;
   textureKey: string;
@@ -29,10 +29,21 @@ interface MoleculeData {
   correctForce: IntermolecularForce;
 }
 
-/* ==================================================
+/* =============================
    SCENE
-================================================== */
+============================= */
 export default class GayaAntarmolekulScene extends Phaser.Scene {
+  private placed = new Set<string>();
+  private roomCode: string = "GAYA-006";
+
+  constructor() {
+    super("GayaAntarmolekulScene");
+  }
+
+  init(data: any) {
+    this.roomCode = data?.roomCode || "GAYA-006";
+  }
+
   private molecules: MoleculeData[] = [
     {
       key: "H2O",
@@ -72,15 +83,6 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
     },
   ];
 
-  private placed = new Set<string>();
-
-  constructor() {
-    super("GayaAntarmolekulScene");
-  }
-
-  /* =============================
-     PRELOAD
-  ============================= */
   preload() {
     this.molecules.forEach((m) => {
       this.load.image(m.textureKey, m.image);
@@ -88,9 +90,8 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
   }
 
   create() {
-    /* =============================
-       BACKGROUND BIRU
-    ============================= */
+    this.placed.clear();
+
     this.cameras.main.setBackgroundColor("#1e88e5");
 
     this.add.text(40, 20, "Ruang Gaya Antarmolekul", {
@@ -98,137 +99,98 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
       color: "#ffffff",
     });
 
-    /* =============================
-       FORCE ZONES
-    ============================= */
-    this.createForceZone(
-      180,
-      380,
-      "Hydrogen Bond",
-      IntermolecularForce.HYDROGEN
-    );
-    this.createForceZone(420, 380, "Dipole–Dipole", IntermolecularForce.DIPOLE);
-    this.createForceZone(660, 380, "London Force", IntermolecularForce.LONDON);
+    /** ZONE */
+    this.createZone(180, 380, "Hydrogen Bond", IntermolecularForce.HYDROGEN);
+    this.createZone(420, 380, "Dipole–Dipole", IntermolecularForce.DIPOLE);
+    this.createZone(660, 380, "London Force", IntermolecularForce.LONDON);
 
-    /* =============================
-       MOLECULE IMAGES (2 BARIS)
-    ============================= */
+    /** MOLECULE */
     this.molecules.forEach((m, i) => {
-      const col = i % 3;
-      const row = Math.floor(i / 3);
-
-      const molecule = this.add
-        .image(200 + col * 180, 140 + row * 120, m.textureKey)
+      const obj = this.add
+        .image(200 + (i % 3) * 180, 140 + Math.floor(i / 3) * 120, m.textureKey)
         .setScale(0.7)
-        .setDepth(2)
-        .setInteractive({ draggable: true });
+        .setInteractive();
 
-      molecule.setData("key", m.key);
-      molecule.setData("correctForce", m.correctForce);
+      obj.setData("key", m.key);
+      obj.setData("correctForce", m.correctForce);
+      obj.setData("startX", obj.x);
+      obj.setData("startY", obj.y);
 
-      this.input.setDraggable(molecule);
+      this.input.setDraggable(obj);
     });
 
-    /* =============================
-       DRAG
-    ============================= */
-    this.input.on(
-      "drag",
-      (
-        _p: Phaser.Input.Pointer,
-        obj: Phaser.GameObjects.Image,
-        x: number,
-        y: number
-      ) => {
-        obj.setPosition(x, y);
-      }
-    );
+    /** DRAG */
+    this.input.on("drag", (_p, obj: any, x, y) => {
+      obj.x = x;
+      obj.y = y;
+    });
 
-    /* =============================
-       DROP
-    ============================= */
-    this.input.on(
-      "drop",
-      (
-        _pointer: Phaser.Input.Pointer,
-        obj: Phaser.GameObjects.Image,
-        zone: Phaser.GameObjects.Zone & { forceType: IntermolecularForce }
-      ) => {
-        const correct = obj.getData("correctForce") === zone.forceType;
+    /** DROP CHECK MANUAL */
+    this.input.on("dragend", (_p, obj: any) => {
+      const force = obj.getData("correctForce");
+      const key = obj.getData("key");
 
-        if (correct) {
+      const zones = this.children
+        .getAll()
+        .filter((z: any) => z.forceType);
+
+      let matched = false;
+
+      zones.forEach((zone: any) => {
+        const dist = Phaser.Math.Distance.Between(obj.x, obj.y, zone.x, zone.y);
+
+        if (dist < 80 && zone.forceType === force) {
           obj.setPosition(zone.x, zone.y);
           obj.disableInteractive();
           obj.setTint(0x88ff88);
 
-          this.placed.add(obj.getData("key"));
-
-          if (this.placed.size === this.molecules.length) {
-            this.showFinalCode();
-          }
-        } else {
-          this.tweens.add({
-            targets: obj,
-            x: obj.x + 10,
-            yoyo: true,
-            repeat: 3,
-            duration: 60,
-          });
+          this.placed.add(key);
+          matched = true;
         }
+      });
+
+      if (!matched) {
+        this.tweens.add({
+          targets: obj,
+          x: obj.getData("startX"),
+          y: obj.getData("startY"),
+          duration: 300,
+          ease: "Back.easeOut",
+        });
       }
-    );
+
+      if (this.placed.size === this.molecules.length) {
+        this.finishPuzzle();
+      }
+    });
   }
 
-  /* =============================
-     FORCE ZONE
-  ============================= */
-  private createForceZone(
+  /** ZONE */
+  private createZone(
     x: number,
     y: number,
     label: string,
     type: IntermolecularForce
   ) {
-    const zone = this.add
-      .zone(x, y, 200, 90)
-      .setRectangleDropZone(200, 90) as Phaser.GameObjects.Zone & {
-        forceType: IntermolecularForce;
-      };
+    const zone = this.add.zone(x, y, 200, 90).setRectangleDropZone(200, 90);
 
-    zone.forceType = type;
+    (zone as any).forceType = type;
 
-    this.add
-      .rectangle(x, y, 200, 90, 0xffffff, 0.15)
-      .setStrokeStyle(2, 0xffffff);
+    this.add.rectangle(x, y, 200, 90, 0xffffff, 0.15).setStrokeStyle(2, 0xffffff);
 
-    this.add
-      .text(x, y, label, {
-        fontSize: "14px",
-        color: "#ffffff",
-      })
-      .setOrigin(0.5);
+    this.add.text(x, y, label, {
+      fontSize: "14px",
+      color: "#ffffff",
+    }).setOrigin(0.5);
   }
 
-  /* =============================
-     FINAL CODE
-  ============================= */
-  private showFinalCode() {
-    const bg = this.add
-      .rectangle(400, 250, 320, 140, 0x000000, 0.8)
-      .setDepth(10);
+  /** FINISH */
+  private finishPuzzle() {
+    this.add.text(400, 520, `KODE AKHIR: ${this.roomCode}`, {
+      fontSize: "30px",
+      color: "#ffffff",
+    }).setOrigin(0.5);
 
-    const text = this.add
-      .text(400, 250, "KODE AKHIR\n6", {
-        fontSize: "30px",
-        color: "#ffffff",
-        align: "center",
-      })
-      .setOrigin(0.5)
-      .setDepth(11);
-
-    this.tweens.add({
-      targets: [bg, text],
-      alpha: { from: 0, to: 1 },
-      duration: 500,
-    });
+    this.game.events.emit("puzzleCompleted", this.roomCode);
   }
 }

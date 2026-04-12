@@ -1,10 +1,13 @@
 import { useEffect, useRef } from "react";
 import Phaser from "phaser";
 import ElektroPuzzle from "../../game/scenes/ElektroPuzzle";
+import { useGameStore } from "../../store/useGameStore";
 
 const ElektroPuzzleWrapper: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
+
+  const setCode = useGameStore((state) => state.setCode);
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -22,11 +25,25 @@ const ElektroPuzzleWrapper: React.FC = () => {
       scene: [ElektroPuzzle],
     });
 
+    // 🔥 LISTENER PHASER → ZUSTAND
+    const handleComplete = (event: any) => {
+      const code = event.detail;
+
+      console.log("Elektro selesai:", code);
+
+      // 🔥 SIMPAN KE GLOBAL STATE
+      setCode("elektro", code);
+    };
+
+    window.addEventListener("puzzleCompleted", handleComplete);
+
     return () => {
+      window.removeEventListener("puzzleCompleted", handleComplete);
+
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, []);
+  }, [setCode]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 };
