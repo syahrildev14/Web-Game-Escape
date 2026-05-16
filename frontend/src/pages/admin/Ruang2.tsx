@@ -22,7 +22,7 @@ const Ruang1 = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/results/room/kovalen")
+      .get("https://api.chemescape.com/api/results/room/kovalen")
       .then((res) => setData(res.data))
       .catch((err) => console.error(err));
   }, []);
@@ -117,7 +117,7 @@ const Ruang1 = () => {
       if (result.isConfirmed) {
         axios
           .delete(
-            `http://localhost:5000/api/results/${id}`
+            `https://api.chemescape.com/api/results/${id}`
           )
           .then(() => {
             setData((prev) =>

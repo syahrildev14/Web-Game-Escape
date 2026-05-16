@@ -14,7 +14,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/videos/intro")
+      .get("https://api.chemescape.com/api/videos/intro")
       .then((res) => {
         if (res.data) setVideoUrl(res.data.url);
       });

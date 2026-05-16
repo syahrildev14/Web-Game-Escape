@@ -66,7 +66,7 @@ export default function StabilizerInputPage() {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/stabilizer/validate-code",
+        "https://api.chemescape.com/api/stabilizer/validate-code",
         {
           method: "POST",
           headers: {

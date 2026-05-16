@@ -91,7 +91,7 @@ const Final = () => {
                                 }`;
 
                             return fetch(
-                                `http://localhost:5000/api/rooms/code/${room}`,
+                                `https://api.chemescape.com/api/rooms/code/${room}`,
                                 {
                                     method:
                                         "PUT",

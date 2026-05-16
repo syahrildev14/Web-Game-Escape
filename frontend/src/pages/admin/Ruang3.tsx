@@ -21,7 +21,7 @@ const Ruang1 = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/results/room/elektro")
+      .get("https://api.chemescape.com/api/results/room/elektro")
       .then(res => setData(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -92,7 +92,7 @@ const Ruang1 = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:5000/api/results/${id}`)
+          .delete(`https://api.chemescape.com/api/results/${id}`)
           .then(() => {
             setData(prev => prev.filter(item => (item as any)._id !== id));
 

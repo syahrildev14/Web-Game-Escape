@@ -11,7 +11,7 @@ const Dashboard = () => {
   const [ranking, setRanking] = useState<Ranking[]>([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/results/ranking/global")
+    axios.get("https://api.chemescape.com/api/results/ranking/global")
       .then(res => setRanking(res.data))
       .catch(err => console.error(err));
   }, []);

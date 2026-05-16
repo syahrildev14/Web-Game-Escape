@@ -17,7 +17,7 @@ const RoomIon: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/questions/ion")
+      .get("https://api.chemescape.com/api/questions/ion")
       .then((res) => {
         setPretest(res.data.pretest);
         setPosttest(res.data.posttest);
@@ -44,7 +44,7 @@ const RoomIon: React.FC = () => {
       }
     };
 
-    axios.post("http://localhost:5000/api/results", payload);
+    axios.post("https://api.chemescape.com/api/results", payload);
   }
 
   return (

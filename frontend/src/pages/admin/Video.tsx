@@ -9,7 +9,7 @@ const AdminVideo = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/videos/intro")
+      .get("https://api.chemescape.com/api/videos/intro")
       .then((res) => {
         if (res.data) setVideoUrl(res.data.url);
       })
@@ -37,7 +37,7 @@ const AdminVideo = () => {
       const embedUrl = convertToEmbed(videoUrl);
 
       await axios.put(
-        "http://localhost:5000/api/videos/intro",
+        "https://api.chemescape.com/api/videos/intro",
         { url: embedUrl }
       );
 

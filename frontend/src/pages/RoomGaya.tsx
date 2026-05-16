@@ -17,7 +17,7 @@ const RoomGaya: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/questions/gaya")
+      .get("https://api.chemescape.com/api/questions/gaya")
       .then((res) => {
         setPretest(res.data.pretest);
         setPosttest(res.data.posttest);
@@ -44,7 +44,7 @@ const RoomGaya: React.FC = () => {
       }
     };
 
-    axios.post("http://localhost:5000/api/results", payload);
+    axios.post("https://api.chemescape.com/api/results", payload);
   }
 
   return (

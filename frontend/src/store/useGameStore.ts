@@ -17,7 +17,7 @@ export const useGameStore = create<RoomCodeState>((set) => ({
         try {
             set({ loading: true });
 
-            const res = await axios.get("http://localhost:5000/api/rooms/all");
+            const res = await axios.get("https://api.chemescape.com/api/rooms/all");
 
             set({ codes: res.data, loading: false });
         } catch (err) {
@@ -27,12 +27,12 @@ export const useGameStore = create<RoomCodeState>((set) => ({
     },
 
     updateCode: async (room, code) => {
-        await axios.put(`http://localhost:5000/api/rooms/code/${room}`, {
+        await axios.put(`https://api.chemescape.com/api/rooms/code/${room}`, {
             code,
         });
 
         // refresh setelah update
-        const res = await axios.get("http://localhost:5000/api/rooms/all");
+        const res = await axios.get("https://api.chemescape.com/api/rooms/all");
         set({ codes: res.data });
     },
 }));

@@ -38,7 +38,7 @@ const Room4 = () => {
   // =============================
   const fetchQuestions = async () => {
     const res = await axios.get(
-      "http://localhost:5000/api/questions/lewis"
+      "https://api.chemescape.com/api/questions/lewis"
     );
 
     const combined = [...res.data.pretest, ...res.data.posttest];
@@ -68,7 +68,7 @@ const Room4 = () => {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    await axios.post("http://localhost:5000/api/questions", {
+    await axios.post("https://api.chemescape.com/api/questions", {
       ...form,
       correctAnswer: Number(form.correctAnswer),
       explanation: form.explanation || "",
@@ -90,7 +90,7 @@ const Room4 = () => {
   // DELETE
   // =============================
   const handleDelete = async (id: number) => {
-    await axios.delete(`http://localhost:5000/api/questions/${id}`);
+    await axios.delete(`https://api.chemescape.com/api/questions/${id}`);
     fetchQuestions();
   };
 
