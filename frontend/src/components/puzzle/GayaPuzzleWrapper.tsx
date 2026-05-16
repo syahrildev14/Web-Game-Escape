@@ -7,7 +7,7 @@ export default function GayaPuzzleWrapper() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
-  const setCode = useGameStore((state) => state.setCode);
+  const updateCode = useGameStore((state) => state.updateCode);
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -28,7 +28,7 @@ export default function GayaPuzzleWrapper() {
       console.log("Gaya puzzle selesai:", code);
 
       // 🔥 SIMPAN KE GLOBAL STATE
-      setCode("gaya", code);
+      updateCode("gaya", code);
     };
 
     window.addEventListener("puzzleCompleted", handleComplete);
@@ -38,7 +38,7 @@ export default function GayaPuzzleWrapper() {
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [setCode]);
+  }, [updateCode]);
 
   return <div ref={containerRef} />;
 }

@@ -3,7 +3,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { RiDeleteBinFill } from "react-icons/ri";
 
-
 import AdminLayout from "../../admin-layout/AdminLayout";
 
 interface Result {
@@ -16,45 +15,67 @@ interface Result {
 const Ruang1 = () => {
   const [data, setData] = useState<Result[]>([]);
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<"name" | "pre" | "post" | "delta" | "date" | "">("");
+  const [sortField, setSortField] = useState<
+    "name" | "pre" | "post" | "delta" | "date" | ""
+  >("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/results/room/kovalen")
-      .then(res => setData(res.data))
-      .catch(err => console.error(err));
+      .then((res) => setData(res.data))
+      .catch((err) => console.error(err));
   }, []);
 
   const filteredData = useMemo(() => {
     let temp = [...data];
 
     if (search.trim() !== "") {
-      temp = temp.filter(item =>
-        item.playerName.toLowerCase().includes(search.toLowerCase())
+      temp = temp.filter((item) =>
+        item.playerName
+          .toLowerCase()
+          .includes(search.toLowerCase())
       );
     }
 
     if (sortField !== "") {
       temp.sort((a, b) => {
-        const deltaA = a.posttestScore - a.pretestScore;
-        const deltaB = b.posttestScore - b.pretestScore;
+        const deltaA =
+          a.posttestScore - a.pretestScore;
+
+        const deltaB =
+          b.posttestScore - b.pretestScore;
 
         const valA =
-          sortField === "name" ? a.playerName.toLowerCase() :
-            sortField === "pre" ? a.pretestScore :
-              sortField === "post" ? a.posttestScore :
-                sortField === "delta" ? deltaA :
-                  sortField === "date" ? new Date(a.createdAt).getTime() : 0;
+          sortField === "name"
+            ? a.playerName.toLowerCase()
+            : sortField === "pre"
+              ? a.pretestScore
+              : sortField === "post"
+                ? a.posttestScore
+                : sortField === "delta"
+                  ? deltaA
+                  : sortField === "date"
+                    ? new Date(a.createdAt).getTime()
+                    : 0;
 
         const valB =
-          sortField === "name" ? b.playerName.toLowerCase() :
-            sortField === "pre" ? b.pretestScore :
-              sortField === "post" ? b.posttestScore :
-                sortField === "delta" ? deltaB :
-                  sortField === "date" ? new Date(b.createdAt).getTime() : 0;
+          sortField === "name"
+            ? b.playerName.toLowerCase()
+            : sortField === "pre"
+              ? b.pretestScore
+              : sortField === "post"
+                ? b.posttestScore
+                : sortField === "delta"
+                  ? deltaB
+                  : sortField === "date"
+                    ? new Date(b.createdAt).getTime()
+                    : 0;
 
-        if (typeof valA === "string" && typeof valB === "string") {
+        if (
+          typeof valA === "string" &&
+          typeof valB === "string"
+        ) {
           return sortOrder === "asc"
             ? valA.localeCompare(valB)
             : valB.localeCompare(valA);
@@ -63,16 +84,19 @@ const Ruang1 = () => {
         return sortOrder === "asc"
           ? Number(valA) - Number(valB)
           : Number(valB) - Number(valA);
-
       });
     }
 
     return temp;
   }, [data, search, sortField, sortOrder]);
 
-  const handleSort = (field: typeof sortField) => {
+  const handleSort = (
+    field: typeof sortField
+  ) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrder(
+        sortOrder === "asc" ? "desc" : "asc"
+      );
     } else {
       setSortField(field);
       setSortOrder("asc");
@@ -88,122 +112,289 @@ const Ruang1 = () => {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Ya, hapus!",
-      cancelButtonText: "Batal"
+      cancelButtonText: "Batal",
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:5000/api/results/${id}`)
+          .delete(
+            `http://localhost:5000/api/results/${id}`
+          )
           .then(() => {
-            setData(prev => prev.filter(item => (item as any)._id !== id));
+            setData((prev) =>
+              prev.filter(
+                (item) =>
+                  (item as any)._id !== id
+              )
+            );
 
             Swal.fire({
               title: "Terhapus!",
               text: "Data berhasil dihapus.",
               icon: "success",
-              timer: 1500
+              timer: 1500,
             });
           })
           .catch(() => {
             Swal.fire({
               title: "Gagal!",
               text: "Terjadi kesalahan saat menghapus data.",
-              icon: "error"
+              icon: "error",
             });
           });
       }
     });
   };
 
-
-
   return (
     <AdminLayout>
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold mb-4">📊 Ruang Kovalen — Hasil Pemain</h1>
-          {/* Search */}
+      <div className="p-4 sm:p-6">
+        {/* HEADER */}
+        <div
+          className="
+            flex flex-col sm:flex-row
+            sm:items-center sm:justify-between
+            gap-4 mb-5
+          "
+        >
+          <h1 className="text-xl sm:text-2xl font-bold">
+            📊 Ruang Kovalen — Hasil Pemain
+          </h1>
+
+          {/* SEARCH */}
           <input
             placeholder="Cari nama..."
-            className="border px-3 py-2 rounded shadow-lg w-1/5 outline-none focus:ring-1 focus:ring-blue-500"
-            onChange={(e) => setSearch(e.target.value)}
+            className="
+              border
+              px-4 py-3
+              rounded-xl
+              shadow-sm
+
+              w-full
+              sm:w-72
+
+              outline-none
+              focus:ring-2
+              focus:ring-blue-500
+            "
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
         </div>
 
-        <table className="w-full border shadow rounded-lg overflow-hidden">
-          <thead className="bg-violet-600 text-white select-none">
-            <tr>
-              <th className="px-3 py-2 text-center">No</th>
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
-                Nama {sortField === "name" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+        {/* TABLE */}
+        <div className="overflow-x-auto rounded-2xl shadow-lg bg-white">
+          <table className="min-w-[900px] w-full border-collapse">
+            <thead className="bg-violet-600 text-white select-none">
+              <tr>
+                <th className="px-4 py-3 text-center whitespace-nowrap">
+                  No
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("pre")}
-              >
-                Pre {sortField === "pre" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+                <th
+                  className="
+                    px-4 py-3
+                    text-center
+                    cursor-pointer
+                    whitespace-nowrap
+                  "
+                  onClick={() =>
+                    handleSort("name")
+                  }
+                >
+                  Nama{" "}
+                  {sortField === "name"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("post")}
-              >
-                Post {sortField === "post" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+                <th
+                  className="
+                    px-4 py-3
+                    text-center
+                    cursor-pointer
+                    whitespace-nowrap
+                  "
+                  onClick={() =>
+                    handleSort("pre")
+                  }
+                >
+                  Pre{" "}
+                  {sortField === "pre"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("delta")}
-              >
-                Peningkatan {sortField === "delta" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+                <th
+                  className="
+                    px-4 py-3
+                    text-center
+                    cursor-pointer
+                    whitespace-nowrap
+                  "
+                  onClick={() =>
+                    handleSort("post")
+                  }
+                >
+                  Post{" "}
+                  {sortField === "post"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("date")}
-              >
-                Tanggal {sortField === "date" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
-              <th className="px-3 py-2 text-center">Aksi</th>
+                <th
+                  className="
+                    px-4 py-3
+                    text-center
+                    cursor-pointer
+                    whitespace-nowrap
+                  "
+                  onClick={() =>
+                    handleSort("delta")
+                  }
+                >
+                  Peningkatan{" "}
+                  {sortField === "delta"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-            </tr>
-          </thead>
+                <th
+                  className="
+                    px-4 py-3
+                    text-center
+                    cursor-pointer
+                    whitespace-nowrap
+                  "
+                  onClick={() =>
+                    handleSort("date")
+                  }
+                >
+                  Tanggal{" "}
+                  {sortField === "date"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-
-          <tbody>
-            {filteredData.map((row, i) => (
-              <tr key={i} className="odd:bg-white even:bg-gray-100">
-                <td className="px-3 py-2 text-center">{i + 1}</td>
-                <td className="px-3 py-2">{row.playerName}</td>
-                <td className="px-3 py-2 text-center">{row.pretestScore}</td>
-                <td className="px-3 py-2 text-center">{row.posttestScore}</td>
-                <td className="px-3 py-2 text-center text-blue-600 font-semibold">
-                  {row.posttestScore - row.pretestScore}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  {new Date(row.createdAt).toLocaleDateString("id-ID")}
-                </td>
-                <td className="px-3 py-2 flex justify-center items-center">
-                  <button
-                    className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 flex items-center gap-2"
-                    onClick={() => handleDelete((row as any).id)}
-                  >
-                    Delete <RiDeleteBinFill />
-                  </button>
-                </td>
-
+                <th className="px-4 py-3 text-center whitespace-nowrap">
+                  Aksi
+                </th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody>
+              {filteredData.map((row, i) => (
+                <tr
+                  key={i}
+                  className="
+                    odd:bg-white
+                    even:bg-gray-100
+                    hover:bg-blue-50
+                    transition
+                  "
+                >
+                  <td className="px-4 py-3 text-center">
+                    {i + 1}
+                  </td>
+
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {row.playerName}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    {row.pretestScore}
+                  </td>
+
+                  <td className="px-4 py-3 text-center">
+                    {row.posttestScore}
+                  </td>
+
+                  <td
+                    className="
+                      px-4 py-3
+                      text-center
+                      text-blue-600
+                      font-semibold
+                    "
+                  >
+                    {row.posttestScore -
+                      row.pretestScore}
+                  </td>
+
+                  <td
+                    className="
+                      px-4 py-3
+                      text-center
+                      whitespace-nowrap
+                    "
+                  >
+                    {new Date(
+                      row.createdAt
+                    ).toLocaleDateString(
+                      "id-ID"
+                    )}
+                  </td>
+
+                  <td className="px-4 py-3">
+                    <div className="flex justify-center">
+                      <button
+                        className="
+                          bg-red-600
+                          hover:bg-red-700
+                          text-white
+
+                          px-3 py-2
+                          rounded-lg
+
+                          flex items-center gap-2
+
+                          text-sm
+                          transition
+                        "
+                        onClick={() =>
+                          handleDelete(
+                            (row as any).id
+                          )
+                        }
+                      >
+                        <RiDeleteBinFill />
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+              {filteredData.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="
+                      text-center
+                      py-10
+                      text-gray-500
+                    "
+                  >
+                    Tidak ada data
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );
 };
 
 export default Ruang1;
-

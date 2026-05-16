@@ -15,6 +15,7 @@ interface Question {
   options: string[];
   correctAnswer: number;
   explanation?: string;
+  reviewData?: any[];
 }
 
 interface MenuSelectionProps {
@@ -169,6 +170,7 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
           questions={pretestQuestions}
           onSubmit={(data) => {
             setPretestResult(data);
+            setReviewData(data.reviewData || []);
             setResult({ title: "Pre-test Selesai", score: data.score });
 
             setShowPre(false);

@@ -7,11 +7,11 @@ export default function Backsound() {
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return; // ✅ aman dari null
+    if (!audio) return; 
 
     if (isOn) {
       audio.volume = 0.3;
-      audio.play().catch(() => {}); // cegah error autoplay
+      audio.play().catch(() => {});
     } else {
       audio.pause();
     }
@@ -23,7 +23,7 @@ export default function Backsound() {
 
       <button
         onClick={() => setIsOn((prev) => !prev)}
-        className="fixed bottom-5 right-5 bg-pink-500 text-white px-4 py-2 rounded-xl shadow-lg"
+        className="fixed top-3 right-5 bg-pink-500 text-white px-4 py-2 rounded-xl shadow-lg z-50"
       >
         {isOn ? "🔊 Sound ON" : "🔇 Sound OFF"}
       </button>

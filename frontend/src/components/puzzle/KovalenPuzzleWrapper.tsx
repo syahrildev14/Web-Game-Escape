@@ -7,7 +7,7 @@ const KovalenPuzzleWrapper: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
-  const setCode = useGameStore((state) => state.setCode);
+  const updateCode = useGameStore((state) => state.updateCode);
 
   useEffect(() => {
     if (gameRef.current || !containerRef.current) return;
@@ -28,7 +28,7 @@ const KovalenPuzzleWrapper: React.FC = () => {
       console.log("Kovalen selesai:", code);
 
       // 🔥 MASUK KE GLOBAL STATE
-      setCode("kovalen", code);
+      updateCode("kovalen", code);
     };
 
     window.addEventListener("puzzleCompleted", handleComplete);
@@ -39,7 +39,7 @@ const KovalenPuzzleWrapper: React.FC = () => {
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [setCode]);
+  }, [updateCode]);
 
   return (
     <div className="flex justify-center items-center">

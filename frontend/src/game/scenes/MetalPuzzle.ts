@@ -116,40 +116,54 @@ export default class MetalPuzzle extends Phaser.Scene {
 
     this.input.setDraggable(card);
 
-    this.input.on("drag", (_p, target: any, dragX, dragY) => {
-      if (target !== card) return;
-      card.setPosition(dragX, dragY);
-      label.setPosition(dragX, dragY);
-    });
+    this.input.on(
+      "drag",
+      (_p: Phaser.Input.Pointer, target: Phaser.GameObjects.GameObject, dragX: number, dragY: number) => {
+        const obj = target as Phaser.GameObjects.Image;
 
-    this.input.on("dragend", (_p, target: any) => {
-      if (target !== card) return;
+        if (obj !== card) return;
 
-      let matched = false;
-
-      slots.forEach((slot, index) => {
-        if (
-          Phaser.Math.Distance.Between(card.x, card.y, slot.x, slot.y) < 60 &&
-          card.getData("accept") === index
-        ) {
-          card.disableInteractive();
-          card.setPosition(slot.x, slot.y);
-          label.setPosition(slot.x, slot.y);
-
-          this.markCorrect();
-          matched = true;
-        }
-      });
-
-      if (!matched) {
-        this.tweens.add({
-          targets: [card, label],
-          y: y,
-          duration: 300,
-          ease: "Back.easeOut",
-        });
+        card.setPosition(dragX, dragY);
+        label.setPosition(dragX, dragY);
       }
-    });
+    );
+
+    this.input.on(
+      "dragend",
+      (_p: Phaser.Input.Pointer, target: Phaser.GameObjects.GameObject) => {
+        const obj = target as Phaser.GameObjects.Image;
+
+        if (obj !== card) return;
+
+        let matched = false;
+
+        slots.forEach((slot, index) => {
+          const isNear =
+            Phaser.Math.Distance.Between(card.x, card.y, slot.x, slot.y) < 60;
+
+          const isCorrect = card.getData("accept") === index;
+
+          if (isNear && isCorrect) {
+            card.disableInteractive();
+            card.setPosition(slot.x, slot.y);
+            label.setPosition(slot.x, slot.y);
+
+            this.markCorrect();
+            matched = true;
+          }
+        });
+
+        if (!matched) {
+          this.tweens.add({
+            targets: [card, label],
+            x: card.getData("startX"),
+            y: card.getData("startY"),
+            duration: 300,
+            ease: "Back.easeOut",
+          });
+        }
+      }
+    );
   }
 
   /** ✔️ CHECK */

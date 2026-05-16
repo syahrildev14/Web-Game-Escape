@@ -13,6 +13,7 @@ import bgDim from "../../assets/background/bgdim.jpg";
 
 export default class KovalenPuzzleScene extends Phaser.Scene {
   private correctCount = 0;
+  private totalCorrect = 4;
 
   constructor() {
     super("KovalenPuzzle");
@@ -35,39 +36,53 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
     this.add.image(400, 300, "bg").setDisplaySize(800, 600).setAlpha(0.7);
 
     // NARASI
-    this.add
-      .text(
-        400,
-        30,
-        "“Ikatan kovalen terbentuk saat atom berbagi elektron.”",
-        {
-          fontSize: "20px",
-          color: "#b9eaff",
-          align: "center",
-          fontFamily: "Poppins",
-          wordWrap: { width: 720 },
-        }
-      )
-      .setOrigin(0.5, 0);
+    this.add.text(
+      400,
+      30,
+      "“Ikatan kovalen terbentuk saat atom berbagi elektron.”",
+      {
+        fontSize: "20px",
+        color: "#b9eaff",
+        align: "center",
+        fontFamily: "Poppins",
+        wordWrap: { width: 720 },
+      }
+    ).setOrigin(0.5, 0);
 
-    this.add
-      .text(400, 90, "Cocokkan molekul → jenis ikatan & elektron", {
+    this.add.text(
+      400,
+      90,
+      "Cocokkan molekul → jenis ikatan & elektron",
+      {
         fontSize: "22px",
         color: "#ffffff",
-      })
-      .setOrigin(0.5, 0);
+      }
+    ).setOrigin(0.5, 0);
+
+    // ================= GLOBAL DRAG EVENTS (FIX UTAMA) =================
+    this.input.on(
+      "drag",
+      (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image, dragX: number, dragY: number) => {
+        obj.x = dragX;
+        obj.y = dragY;
+      }
+    );
+
+   this.input.on("dragend", (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image) => {
+  this.checkDrop(obj);
+});
 
     // MOLEKUL
     this.createDraggable(150, 500, "h2", "H2");
     this.createDraggable(400, 500, "o2", "O2");
     this.createDraggable(650, 500, "co2", "CO2");
 
-    // SLOT
-    this.createSlot(200, 260, "single", "H2");
-    this.createSlot(400, 260, "double", "O2/CO2");
+    // SLOT (FIX: ARRAY ACCEPT)
+    this.createSlot(200, 260, "single", ["H2"]);
+    this.createSlot(400, 260, "double", ["O2", "CO2"]);
 
-    this.createSlot(260, 160, "e1", "H2");
-    this.createSlot(540, 160, "e2", "O2/CO2");
+    this.createSlot(260, 160, "e1", ["H2"]);
+    this.createSlot(540, 160, "e2", ["O2", "CO2"]);
   }
 
   // ================= DRAG OBJECT =================
@@ -78,6 +93,8 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
     obj.setData("startX", x);
     obj.setData("startY", y);
 
+    this.input.setDraggable(obj);
+
     this.tweens.add({
       targets: obj,
       angle: { from: -6, to: 6 },
@@ -87,24 +104,11 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       ease: "Sine.easeInOut",
     });
 
-    this.input.setDraggable(obj);
-
-    this.input.on("drag", (_p, target, x, y) => {
-      if (target === obj) {
-        target.x = x;
-        target.y = y;
-      }
-    });
-
-    this.input.on("dragend", (_p, target) => {
-      this.checkDrop(target as Phaser.GameObjects.Image);
-    });
-
     return obj;
   }
 
   // ================= SLOT =================
-  private createSlot(x: number, y: number, key: string, accept: string) {
+  private createSlot(x: number, y: number, key: string, accept: string[]) {
     const slot = this.add.image(x, y, key).setAlpha(0.9);
     slot.setData("accept", accept);
     return slot;
@@ -119,18 +123,18 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       .filter((c: any) => c.getData("accept")) as Phaser.GameObjects.Image[];
 
     for (const slot of slots) {
-      const accept = slot.getData("accept");
+      const accept = slot.getData("accept") as string[];
 
-      if (
-        Phaser.Math.Distance.Between(obj.x, obj.y, slot.x, slot.y) < 60 &&
-        accept.includes(tag)
-      ) {
+      const isNear =
+        Phaser.Math.Distance.Between(obj.x, obj.y, slot.x, slot.y) < 60;
+
+      if (isNear && accept.includes(tag)) {
         this.markCorrect(obj);
         return;
       }
     }
 
-    // kembali
+    // RETURN TO START
     this.tweens.add({
       targets: obj,
       x: obj.getData("startX"),
@@ -147,26 +151,23 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
 
     this.correctCount++;
 
-    if (this.correctCount === 6) {
+    if (this.correctCount >= this.totalCorrect) {
       this.finishPuzzle();
     }
   }
 
   // ================= FINISH =================
   private finishPuzzle() {
-    this.add
-      .text(400, 560, "Puzzle Selesai!", {
-        fontSize: "26px",
-        color: "#00ffea",
-        fontFamily: "Poppins",
-      })
-      .setOrigin(0.5);
+    this.add.text(400, 560, "Puzzle Selesai!", {
+      fontSize: "26px",
+      color: "#00ffea",
+      fontFamily: "Poppins",
+    }).setOrigin(0.5);
 
     this.time.delayedCall(1200, () => {
-      // 🔥 FIX: konsisten dengan wrapper kamu
       window.dispatchEvent(
         new CustomEvent("puzzleCompleted", {
-          detail: "B",
+          detail: "kovalen",
         })
       );
     });

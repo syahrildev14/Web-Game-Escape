@@ -24,23 +24,21 @@ export default class LewisPuzzle extends Phaser.Scene {
     // BACKGROUND
     this.add.image(400, 300, "bg").setDisplaySize(800, 600);
 
-    // NARASI
-    this.add
-      .text(
-        400,
-        30,
-        "“Kembalikan struktur Lewis atom ini!” — Dr. Ion",
-        {
-          fontSize: "20px",
-          color: "#c7f3ff",
-          align: "center",
-          fontFamily: "Poppins",
-          wordWrap: { width: 720 },
-        }
-      )
-      .setOrigin(0.5, 0);
+    // TEXT
+    this.add.text(
+      400,
+      30,
+      "“Kembalikan struktur Lewis atom ini!” — Dr. Ion",
+      {
+        fontSize: "20px",
+        color: "#c7f3ff",
+        align: "center",
+        fontFamily: "Poppins",
+        wordWrap: { width: 720 },
+      }
+    ).setOrigin(0.5, 0);
 
-    // ATOM CENTER
+    // ATOM
     this.add.image(400, 320, "carbon").setScale(0.9);
 
     // SLOT
@@ -51,12 +49,27 @@ export default class LewisPuzzle extends Phaser.Scene {
       this.createSlot(300, 320),
     ];
 
+    // ================= GLOBAL DRAG (FIX UTAMA) =================
+    this.input.on(
+      "drag",
+      (_pointer: Phaser.Input.Pointer, obj: any, dragX: number, dragY: number) => {
+        obj.x = dragX;
+        obj.y = dragY;
+      }
+    );
+
+    this.input.on(
+      "dragend",
+      (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
+        this.checkDrop(obj as Phaser.GameObjects.Image, slots);
+      }
+    );
+
     // ELECTRONS
     for (let i = 0; i < this.totalElectrons; i++) {
       this.createElectron(
         Phaser.Math.Between(100, 700),
-        Phaser.Math.Between(150, 550),
-        slots
+        Phaser.Math.Between(150, 550)
       );
     }
   }
@@ -69,48 +82,46 @@ export default class LewisPuzzle extends Phaser.Scene {
   }
 
   // ================= ELECTRON =================
-  private createElectron(
-    x: number,
-    y: number,
-    slots: Phaser.GameObjects.Image[]
-  ) {
-    const dot = this.add.image(x, y, "electron").setInteractive();
+  private createElectron(x: number, y: number) {
+    const dot = this.add.image(x, y, "electron");
+
+    dot.setInteractive();
     dot.setScale(0.6);
+
+    dot.setData("startX", x);
+    dot.setData("startY", y);
 
     this.input.setDraggable(dot);
 
-    this.input.on("drag", (_p, target, dx, dy) => {
-      if (target === dot) {
-        target.x = dx;
-        target.y = dy;
+    return dot;
+  }
+
+  // ================= DROP CHECK =================
+  private checkDrop(
+    obj: Phaser.GameObjects.Image,
+    slots: Phaser.GameObjects.Image[]
+  ) {
+    for (const slot of slots) {
+      if (
+        !slot.getData("filled") &&
+        Phaser.Math.Distance.Between(obj.x, obj.y, slot.x, slot.y) < 40
+      ) {
+        obj.disableInteractive();
+        obj.setPosition(slot.x, slot.y);
+        slot.setData("filled", true);
+
+        this.markCorrect();
+        return;
       }
-    });
+    }
 
-    this.input.on("dragend", (_p, target) => {
-      if (target !== dot) return;
-
-      for (const slot of slots) {
-        if (
-          !slot.getData("filled") &&
-          Phaser.Math.Distance.Between(dot.x, dot.y, slot.x, slot.y) < 40
-        ) {
-          dot.disableInteractive();
-          dot.setPosition(slot.x, slot.y);
-          slot.setData("filled", true);
-
-          this.markCorrect();
-          return;
-        }
-      }
-
-      // kembali posisi
-      this.tweens.add({
-        targets: dot,
-        x,
-        y,
-        duration: 300,
-        ease: "Back.easeOut",
-      });
+    // RETURN TO START
+    this.tweens.add({
+      targets: obj,
+      x: obj.getData("startX"),
+      y: obj.getData("startY"),
+      duration: 300,
+      ease: "Back.easeOut",
     });
   }
 
@@ -118,26 +129,23 @@ export default class LewisPuzzle extends Phaser.Scene {
   private markCorrect() {
     this.correctPlaced++;
 
-    if (this.correctPlaced === this.totalElectrons) {
+    if (this.correctPlaced >= this.totalElectrons) {
       this.finishPuzzle();
     }
   }
 
   // ================= FINISH =================
   private finishPuzzle() {
-    this.add
-      .text(400, 560, "Struktur Lewis Lengkap!", {
-        fontSize: "28px",
-        color: "#00ffd5",
-        fontFamily: "Poppins",
-      })
-      .setOrigin(0.5);
+    this.add.text(400, 560, "Struktur Lewis Lengkap!", {
+      fontSize: "28px",
+      color: "#00ffd5",
+      fontFamily: "Poppins",
+    }).setOrigin(0.5);
 
     this.time.delayedCall(1200, () => {
-      // 🔥 FIX: konsisten dengan wrapper kamu
       window.dispatchEvent(
         new CustomEvent("puzzleCompleted", {
-          detail: "L",
+          detail: "lewis",
         })
       );
     });

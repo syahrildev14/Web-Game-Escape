@@ -42,7 +42,7 @@ const Header = () => {
       <button
         onClick={handleLogout}
         className="
-          flex items-center justify-center gap-3
+          fixed bottom-6 z-50 right-5 flex items-center justify-center gap-3
           text-base font-semibold text-violet-900
           bg-gradient-to-t from-blue-400 to-blue-200
           px-6 py-2 rounded-lg

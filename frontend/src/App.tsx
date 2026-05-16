@@ -29,13 +29,15 @@ import Room5 from "./pages/admin/soal/Room5";
 import Room6 from "./pages/admin/soal/Room6";
 import Video from "./pages/admin/Video";
 import FinalKode from "./pages/admin/Final";
+import SplashCursor from "./components/SplashCursor";
 
 
 function App() {
   return (
     <BrowserRouter>
-      {/* <SplashCursor /> */}
-      {/* <Backsound /> */}
+      <SplashCursor />
+      
+      <Backsound />
 
       <Routes>
         <Route path="/" element={<Home />} />

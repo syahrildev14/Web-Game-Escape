@@ -92,16 +92,26 @@ export default class ElektroPuzzle extends Phaser.Scene {
 
     this.input.setDraggable(obj);
 
-    this.input.on("drag", (_p, target, dx, dy) => {
-      if (target === obj) {
-        target.x = dx;
-        target.y = dy;
-      }
-    });
+    this.input.on(
+      "drag",
+      (
+        _p: Phaser.Input.Pointer,
+        target: Phaser.GameObjects.Image,
+        dx: number,
+        dy: number
+      ) => {
+        if (target === obj) {
+          target.x = dx;
+          target.y = dy;
+        }
+      });
 
-    this.input.on("dragend", (_p, target) => {
-      this.checkDrop(target as Phaser.GameObjects.Image);
-    });
+    this.input.on(
+      "dragend",
+      (_p: Phaser.Input.Pointer, target: Phaser.GameObjects.GameObject) => {
+        this.checkDrop(target as Phaser.GameObjects.Image);
+      }
+    );
   }
 
   // ================= CHECK =================

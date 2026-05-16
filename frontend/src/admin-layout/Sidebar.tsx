@@ -13,6 +13,7 @@ import { GiMagnet, GiMetalBar } from "react-icons/gi";
 import { FaRegListAlt } from "react-icons/fa";
 import { FaRegCircleDot } from "react-icons/fa6";
 import { RiVideoAddFill } from "react-icons/ri";
+import { MdOutlinePassword } from "react-icons/md";
 
 
 interface MenuItem {
@@ -43,7 +44,7 @@ const menuItems: MenuItem[] = [
     ],
   },
   { label: "Video", path: "/admin/video", icon: <RiVideoAddFill size={22} /> },
-  { label: "Final", path: "/admin/final", icon: <RiVideoAddFill size={22} /> },
+  { label: "Final", path: "/admin/final", icon: <MdOutlinePassword size={22} /> },
 ];
 
 const Sidebar = () => {
@@ -65,8 +66,26 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="h-full px-4 py-6 bg-gradient-to-tr from-violet-700 to-violet-950 flex flex-col justify-between">
-      <nav className="space-y-2">
+    <aside
+      className="
+    h-screen
+    overflow-y-auto
+    overflow-x-hidden
+
+    px-4 py-6
+    bg-gradient-to-tr
+    from-violet-700
+    to-violet-950
+
+    flex flex-col
+    justify-between
+
+    scrollbar-thin
+    scrollbar-thumb-violet-500
+    scrollbar-track-transparent
+  "
+    >
+      <nav className="space-y-2 mb-8">
         {menuItems.map((item) => (
           <div key={item.label}>
             {!item.children ? (
@@ -129,45 +148,146 @@ const Sidebar = () => {
 
       {/* CARD */}
       <div
-        style={{ boxShadow: "inset 0 0 16px rgba(0,0,0,0.25)" }}
-        className="bg-gradient-to-tr from-white via-gray-300 to-white border-4 border-white backdrop-blur-md py-5 rounded-3xl flex flex-col items-center justify-center text-center"
+        style={{ boxShadow: "inset 0 0 16px rgba(0,0,0,0.20)" }}
+        className="
+    bg-gradient-to-tr
+    from-white
+    via-gray-200
+    to-white
+    border-4 border-white
+    backdrop-blur-md
+    rounded-3xl
+
+    py-5 px-4
+    sm:py-6 sm:px-6
+
+    flex flex-col
+    items-center
+    justify-center
+    text-center
+
+    shadow-lg
+    transition-all
+  "
       >
         <img
           src={avatar}
           alt="profile admin"
           onClick={() => setShowPopup(true)}
-          className="w-20  rounded-full mb-3 cursor-pointer hover:scale-105 transition"
+          className="
+      w-20 h-20
+      sm:w-24 sm:h-24
+
+      object-cover
+      rounded-full
+      mb-3
+
+      cursor-pointer
+      hover:scale-105
+      transition-all
+      duration-200
+
+      shadow-md
+      border-4 border-white
+    "
         />
 
-        <p className="font-semibold text-lg">
+        <p className="font-semibold text-base sm:text-lg text-gray-800 leading-relaxed">
           Hi, {user?.name || "Admin"}
           <br />
-          <span className="text-sm font-normal">Selamat Datang</span>
+
+          <span className="text-sm font-normal text-gray-600">
+            Selamat Datang
+          </span>
         </p>
       </div>
 
       {/* POPUP OVERLAY */}
       {showPopup && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl shadow-xl w-[300px] text-center">
-            <h2 className="font-semibold mb-4 text-lg">Pilih Avatar</h2>
+        <div
+          className="
+      fixed inset-0
+      bg-black/40
+      backdrop-blur-sm
+      flex items-center justify-center
+      z-50
+      px-4
+    "
+        >
+          <div
+            className="
+        bg-white
+        w-full
+        max-w-sm
 
-            <div className="flex justify-center gap-6 mb-4">
+        p-5 sm:p-6
+        rounded-2xl
+        shadow-2xl
+        text-center
+        animate-in fade-in zoom-in-95
+      "
+          >
+            <h2 className="font-semibold text-lg sm:text-xl mb-5 text-gray-800">
+              Pilih Avatar
+            </h2>
+
+            <div className="flex justify-center gap-4 sm:gap-6 mb-5">
               <img
                 src={avatarMale}
                 onClick={() => handleSelectAvatar(avatarMale)}
-                className={`w-20 rounded-full cursor-pointer hover:scale-105 transition shadow ${avatar === avatarMale ? "ring-2 ring-blue-600" : ""}`}
+                className={`
+            w-20 h-20
+            sm:w-24 sm:h-24
+
+            object-cover
+            rounded-full
+            cursor-pointer
+            hover:scale-105
+            transition-all
+            duration-200
+
+            shadow-md
+            border-4 border-white
+
+            ${avatar === avatarMale
+                    ? "ring-4 ring-violet-500"
+                    : ""
+                  }
+          `}
               />
 
               <img
                 src={avatarFemale}
                 onClick={() => handleSelectAvatar(avatarFemale)}
-                className={`w-20 rounded-full cursor-pointer hover:scale-105 transition shadow ${avatar === avatarFemale ? "ring-2 ring-blue-600" : ""}`}
+                className={`
+            w-20 h-20
+            sm:w-24 sm:h-24
+
+            object-cover
+            rounded-full
+            cursor-pointer
+            hover:scale-105
+            transition-all
+            duration-200
+
+            shadow-md
+            border-4 border-white
+
+            ${avatar === avatarFemale
+                    ? "ring-4 ring-violet-500"
+                    : ""
+                  }
+          `}
               />
             </div>
 
             <button
-              className="mt-2 text-sm text-gray-600 hover:text-black transition"
+              className="
+          text-sm
+          text-gray-500
+          hover:text-black
+          transition
+        "
               onClick={() => setShowPopup(false)}
             >
               Batal

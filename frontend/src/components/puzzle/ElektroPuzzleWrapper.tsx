@@ -7,7 +7,7 @@ const ElektroPuzzleWrapper: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
-  const setCode = useGameStore((state) => state.setCode);
+  const updateCode = useGameStore((state) => state.updateCode);
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -32,7 +32,7 @@ const ElektroPuzzleWrapper: React.FC = () => {
       console.log("Elektro selesai:", code);
 
       // 🔥 SIMPAN KE GLOBAL STATE
-      setCode("elektro", code);
+      updateCode("elektro", code);
     };
 
     window.addEventListener("puzzleCompleted", handleComplete);
@@ -43,7 +43,7 @@ const ElektroPuzzleWrapper: React.FC = () => {
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [setCode]);
+  }, [updateCode]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 };

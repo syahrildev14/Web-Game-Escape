@@ -118,88 +118,186 @@ const Ruang1 = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-bold mb-4">📊 Ruang Gaya — Hasil Pemain</h1>
-          {/* Search */}
+      <div className="p-3 sm:p-4 md:p-6">
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <h1 className="text-lg sm:text-xl font-bold">
+            📊 Ruang Gaya — Hasil Pemain
+          </h1>
+
+          {/* SEARCH */}
           <input
             placeholder="Cari nama..."
-            className="border px-3 py-2 rounded shadow-lg w-1/5 outline-none focus:ring-1 focus:ring-blue-500"
+            className="
+          border border-gray-300
+          px-3 py-2
+          rounded-xl
+          shadow-sm
+          w-full md:w-72
+          outline-none
+          transition
+          focus:ring-2 focus:ring-violet-500
+          focus:border-violet-500
+        "
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <table className="w-full border shadow rounded-lg overflow-hidden">
-          <thead className="bg-violet-600 text-white select-none">
-            <tr>
-              <th className="px-3 py-2 text-center">No</th>
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("name")}
-              >
-                Nama {sortField === "name" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+        {/* TABLE */}
+        <div
+          className="
+        overflow-x-auto
+        rounded-2xl
+        shadow-lg
+        border border-gray-200
+        bg-white
+      "
+        >
+          <table className="min-w-[850px] w-full border-collapse">
+            <thead className="bg-violet-600 text-white select-none">
+              <tr>
+                <th className="px-3 py-3 text-center whitespace-nowrap">
+                  No
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("pre")}
-              >
-                Pre {sortField === "pre" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+                <th
+                  className="px-3 py-3 text-center cursor-pointer whitespace-nowrap"
+                  onClick={() => handleSort("name")}
+                >
+                  Nama{" "}
+                  {sortField === "name"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("post")}
-              >
-                Post {sortField === "post" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+                <th
+                  className="px-3 py-3 text-center cursor-pointer whitespace-nowrap"
+                  onClick={() => handleSort("pre")}
+                >
+                  Pre{" "}
+                  {sortField === "pre"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("delta")}
-              >
-                Peningkatan {sortField === "delta" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
+                <th
+                  className="px-3 py-3 text-center cursor-pointer whitespace-nowrap"
+                  onClick={() => handleSort("post")}
+                >
+                  Post{" "}
+                  {sortField === "post"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-              <th
-                className="px-3 py-2 text-center cursor-pointer"
-                onClick={() => handleSort("date")}
-              >
-                Tanggal {sortField === "date" ? (sortOrder === "asc" ? "▲" : "▼") : "↕"}
-              </th>
-              <th className="px-3 py-2 text-center">Aksi</th>
+                <th
+                  className="px-3 py-3 text-center cursor-pointer whitespace-nowrap"
+                  onClick={() => handleSort("delta")}
+                >
+                  Peningkatan{" "}
+                  {sortField === "delta"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-            </tr>
-          </thead>
+                <th
+                  className="px-3 py-3 text-center cursor-pointer whitespace-nowrap"
+                  onClick={() => handleSort("date")}
+                >
+                  Tanggal{" "}
+                  {sortField === "date"
+                    ? sortOrder === "asc"
+                      ? "▲"
+                      : "▼"
+                    : "↕"}
+                </th>
 
-
-          <tbody>
-            {filteredData.map((row, i) => (
-              <tr key={i} className="odd:bg-white even:bg-gray-100">
-                <td className="px-3 py-2 text-center">{i + 1}</td>
-                <td className="px-3 py-2">{row.playerName}</td>
-                <td className="px-3 py-2 text-center">{row.pretestScore}</td>
-                <td className="px-3 py-2 text-center">{row.posttestScore}</td>
-                <td className="px-3 py-2 text-center text-blue-600 font-semibold">
-                  {row.posttestScore - row.pretestScore}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  {new Date(row.createdAt).toLocaleDateString("id-ID")}
-                </td>
-                <td className="px-3 py-2 flex justify-center items-center">
-                  <button
-                    className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 flex items-center gap-2"
-                    onClick={() => handleDelete((row as any).id)}
-                  >
-                    Delete <RiDeleteBinFill />
-                  </button>
-                </td>
-
+                <th className="px-3 py-3 text-center whitespace-nowrap">
+                  Aksi
+                </th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody>
+              {filteredData.map((row, i) => (
+                <tr
+                  key={i}
+                  className="
+                odd:bg-white
+                even:bg-gray-50
+                hover:bg-violet-50
+                transition-colors
+                border-b border-gray-100
+              "
+                >
+                  <td className="px-3 py-3 text-center whitespace-nowrap">
+                    {i + 1}
+                  </td>
+
+                  <td className="px-3 py-3 whitespace-nowrap font-medium text-gray-700">
+                    {row.playerName}
+                  </td>
+
+                  <td className="px-3 py-3 text-center whitespace-nowrap">
+                    {row.pretestScore}
+                  </td>
+
+                  <td className="px-3 py-3 text-center whitespace-nowrap">
+                    {row.posttestScore}
+                  </td>
+
+                  <td
+                    className="
+                  px-3 py-3
+                  text-center
+                  font-semibold
+                  text-blue-600
+                  whitespace-nowrap
+                "
+                  >
+                    {row.posttestScore - row.pretestScore}
+                  </td>
+
+                  <td className="px-3 py-3 text-center whitespace-nowrap text-gray-600">
+                    {new Date(row.createdAt).toLocaleDateString("id-ID")}
+                  </td>
+
+                  <td className="px-3 py-3">
+                    <div className="flex justify-center">
+                      <button
+                        className="
+                      bg-red-600
+                      hover:bg-red-700
+                      text-white
+                      px-3 py-2
+                      rounded-lg
+                      flex items-center gap-2
+                      text-sm
+                      transition-all
+                      duration-200
+                      shadow-sm
+                      hover:shadow-md
+                      whitespace-nowrap
+                    "
+                        onClick={() => handleDelete((row as any).id)}
+                      >
+                        Delete <RiDeleteBinFill />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );

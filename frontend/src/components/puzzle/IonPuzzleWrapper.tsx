@@ -14,7 +14,7 @@ const IonPuzzleWrapper: React.FC<IonPuzzleWrapperProps> = ({ onComplete }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
-  const setCode = useGameStore((state) => state.setCode);
+  const updateCode = useGameStore((state) => state.updateCode);
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -39,7 +39,7 @@ const IonPuzzleWrapper: React.FC<IonPuzzleWrapperProps> = ({ onComplete }) => {
       console.log("Ion puzzle selesai:", code);
 
       // ✅ simpan ke zustand
-      setCode("ion", code);
+      updateCode("ion", code);
 
       // 🔥 trigger ke React (MenuSelection)
       if (onComplete) onComplete();
@@ -53,7 +53,7 @@ const IonPuzzleWrapper: React.FC<IonPuzzleWrapperProps> = ({ onComplete }) => {
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [setCode, onComplete]);
+  }, [updateCode, onComplete]);
 
   return <div ref={containerRef} className="w-full h-full overflow-hidden" />;
 };

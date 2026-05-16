@@ -7,7 +7,7 @@ const LewisPuzzleWrapper: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
 
-  const setCode = useGameStore((state) => state.setCode);
+  const updateCode = useGameStore((state) => state.updateCode);
 
   useEffect(() => {
     if (!containerRef.current || gameRef.current) return;
@@ -32,7 +32,7 @@ const LewisPuzzleWrapper: React.FC = () => {
       console.log("Lewis selesai:", code);
 
       // 🔥 SIMPAN KE GLOBAL STATE
-      setCode("lewis", code);
+      updateCode("lewis", code);
     };
 
     window.addEventListener("puzzleCompleted", handleComplete);
@@ -43,7 +43,7 @@ const LewisPuzzleWrapper: React.FC = () => {
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, [setCode]);
+  }, [updateCode]);
 
   return (
     <div
