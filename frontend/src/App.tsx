@@ -29,6 +29,7 @@ import Room5 from "./pages/admin/soal/Room5";
 import Room6 from "./pages/admin/soal/Room6";
 import Video from "./pages/admin/Video";
 import FinalKode from "./pages/admin/Final";
+import RefleksiAdmin from "./pages/admin/Refleksi";
 import SplashCursor from "./components/SplashCursor";
 
 
@@ -178,6 +179,16 @@ function App() {
           element={
             <RequireAuth>
               <FinalKode />
+            </RequireAuth>
+          }
+        />
+
+         {/* Refleksi */}
+        <Route
+          path="/admin/refleksi"
+          element={
+            <RequireAuth>
+              <RefleksiAdmin />
             </RequireAuth>
           }
         />

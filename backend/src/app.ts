@@ -8,6 +8,7 @@ import roomRoutes from "./routes/room.route";
 import resultRoutes from "./routes/result.route";
 import authRoutes from "./routes/auth.route";
 import stabilizerRoutes from "./routes/stabilizer.route";
+import reflectionRoutes from "./routes/reflection.route";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/api/rooms", roomRoutes);
 app.use("/api/results", resultRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/stabilizer", stabilizerRoutes);
+app.use("/api/reflections", reflectionRoutes);
 
 // ===============================
 // HEALTH CHECK
@@ -73,6 +75,5 @@ app.use((err: any, req: any, res: any, next: any) => {
     });
 });
 
-app.use("/api/stabilizer", stabilizerRoutes);
 
 export default app;

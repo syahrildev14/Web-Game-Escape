@@ -7,7 +7,7 @@ import { getCurrentUser } from "../../../backend/src/utils/auth";
 
 import { RxDashboard } from "react-icons/rx";
 import { TbTopologyStar3 } from "react-icons/tb";
-import { BiAtom, BiMove } from "react-icons/bi";
+import { BiAtom, BiMessageRoundedError, BiMove } from "react-icons/bi";
 import { FiLink } from "react-icons/fi";
 import { GiMagnet, GiMetalBar } from "react-icons/gi";
 import { FaRegListAlt } from "react-icons/fa";
@@ -45,6 +45,7 @@ const menuItems: MenuItem[] = [
   },
   { label: "Video", path: "/admin/video", icon: <RiVideoAddFill size={22} /> },
   { label: "Final", path: "/admin/final", icon: <MdOutlinePassword size={22} /> },
+  { label: "Refleksi", path: "/admin/refleksi", icon: <BiMessageRoundedError size={22} /> },
 ];
 
 const Sidebar = () => {
@@ -68,9 +69,10 @@ const Sidebar = () => {
   return (
     <aside
       className="
+    sticky
+    top-0
     h-screen
     overflow-y-auto
-    overflow-x-hidden
 
     px-4 py-6
     bg-gradient-to-tr
