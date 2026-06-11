@@ -28,15 +28,11 @@ interface MoleculeData {
 /* ============================= */
 export default class GayaAntarmolekulScene extends Phaser.Scene {
   private placed = new Set<string>();
-  private roomCode: string = "GAYA-006";
 
   constructor() {
     super("GayaAntarmolekulScene");
   }
 
-  init(data: any) {
-    this.roomCode = data?.roomCode || "GAYA-006";
-  }
 
   private molecules: MoleculeData[] = [
     { key: "H2O", textureKey: "h2o", image: h2oImg, correctForce: IntermolecularForce.HYDROGEN },
@@ -58,22 +54,105 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
   create() {
     this.placed.clear();
 
-    this.cameras.main.setBackgroundColor("#1e88e5");
+    // ================= BACKGROUND =================
+    this.cameras.main.setBackgroundColor("#0f172a");
 
-    this.add.text(40, 20, "Ruang Gaya Antarmolekul", {
-      fontSize: "26px",
-      color: "#ffffff",
-    });
+    // ================= PANEL INSTRUKSI =================
+    const infoBox = this.add.rectangle(
+      400,
+      95,
+      720,
+      120,
+      0x000000,
+      0.55
+    );
 
-    /** ZONE */
-    this.createZone(180, 380, "Hydrogen Bond", IntermolecularForce.HYDROGEN);
-    this.createZone(420, 380, "Dipole–Dipole", IntermolecularForce.DIPOLE);
-    this.createZone(660, 380, "London Force", IntermolecularForce.LONDON);
+    infoBox.setStrokeStyle(2, 0x4ade80);
 
-    /** ================= DRAG GLOBAL (FIX UTAMA) ================= */
+    this.add
+      .text(400, 40, "Puzzle Gaya Antarmolekul", {
+        fontSize: "28px",
+        color: "#ffffff",
+        fontFamily: "Poppins",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    this.add
+      .text(
+        400,
+        75,
+        "Tugas: Kelompokkan molekul berdasarkan gaya antarmolekul dominannya.",
+        {
+          fontSize: "16px",
+          color: "#facc15",
+          fontFamily: "Poppins",
+          align: "center",
+          wordWrap: { width: 650 },
+        }
+      )
+      .setOrigin(0.5);
+
+    this.add
+      .text(
+        400,
+        110,
+        "1. Seret molekul ke kategori yang sesuai.\n2. Cocokkan dengan Hydrogen Bond, Dipole–Dipole, atau London Force.\n3. Semua molekul harus berada pada kategori yang benar.",
+        {
+          fontSize: "14px",
+          color: "#ffffff",
+          align: "center",
+          fontFamily: "Poppins",
+        }
+      )
+      .setOrigin(0.5);
+
+    // ================= LABEL EDUKASI =================
+    this.add
+      .text(
+        400,
+        170,
+        "Gaya antarmolekul memengaruhi titik didih, titik leleh, dan sifat fisik suatu zat.",
+        {
+          fontSize: "16px",
+          color: "#93c5fd",
+          align: "center",
+          fontFamily: "Poppins",
+        }
+      )
+      .setOrigin(0.5);
+
+    // ================= ZONE =================
+    this.createZone(
+      180,
+      360,
+      "Hydrogen Bond",
+      IntermolecularForce.HYDROGEN
+    );
+
+    this.createZone(
+      400,
+      360,
+      "Dipole–Dipole",
+      IntermolecularForce.DIPOLE
+    );
+
+    this.createZone(
+      620,
+      360,
+      "London Force",
+      IntermolecularForce.LONDON
+    );
+
+    // ================= GLOBAL DRAG =================
     this.input.on(
       "drag",
-      (_pointer: Phaser.Input.Pointer, obj: any, dragX: number, dragY: number) => {
+      (
+        _pointer: Phaser.Input.Pointer,
+        obj: Phaser.GameObjects.Image,
+        dragX: number,
+        dragY: number
+      ) => {
         obj.x = dragX;
         obj.y = dragY;
       }
@@ -81,24 +160,49 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
 
     this.input.on(
       "dragend",
-      (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.GameObject) => {
+      (
+        _pointer: Phaser.Input.Pointer,
+        obj: Phaser.GameObjects.GameObject
+      ) => {
         this.checkDrop(obj as Phaser.GameObjects.Image);
       }
     );
 
-    /** MOLECULE */
+    // ================= MOLEKUL =================
     this.molecules.forEach((m, i) => {
       const obj = this.add
-        .image(200 + (i % 3) * 180, 140 + Math.floor(i / 3) * 120, m.textureKey)
-        .setScale(0.7)
+        .image(
+          170 + (i % 3) * 220,
+          500 + Math.floor(i / 3) * 70,
+          m.textureKey
+        )
+        .setScale(0.65)
         .setInteractive();
 
       obj.setData("key", m.key);
       obj.setData("correctForce", m.correctForce);
+
       obj.setData("startX", obj.x);
       obj.setData("startY", obj.y);
 
       this.input.setDraggable(obj);
+
+      this.tweens.add({
+        targets: obj,
+        angle: { from: -5, to: 5 },
+        duration: 1800,
+        repeat: -1,
+        yoyo: true,
+        ease: "Sine.easeInOut",
+      });
+
+      this.add
+        .text(obj.x, obj.y + 40, m.key, {
+          fontSize: "14px",
+          color: "#ffffff",
+          fontFamily: "Poppins",
+        })
+        .setOrigin(0.5);
     });
   }
 
@@ -148,30 +252,72 @@ export default class GayaAntarmolekulScene extends Phaser.Scene {
     label: string,
     type: IntermolecularForce
   ) {
-    const zone = this.add.zone(x, y, 200, 90);
+    const zone = this.add.zone(
+      x,
+      y,
+      190,
+      100
+    );
 
     (zone as any).forceType = type;
 
-    this.add.rectangle(x, y, 200, 90, 0xffffff, 0.15).setStrokeStyle(2, 0xffffff);
+    this.add
+      .rectangle(
+        x,
+        y,
+        190,
+        100,
+        0xffffff,
+        0.12
+      )
+      .setStrokeStyle(2, 0x4ade80);
 
-    this.add.text(x, y, label, {
-      fontSize: "14px",
-      color: "#ffffff",
-    }).setOrigin(0.5);
+    this.add
+      .text(
+        x,
+        y,
+        label,
+        {
+          fontSize: "16px",
+          color: "#ffffff",
+          fontStyle: "bold",
+          align: "center",
+          fontFamily: "Poppins",
+        }
+      )
+      .setOrigin(0.5);
+
+    return zone;
   }
 
   /* ============================= */
   private finishPuzzle() {
-    this.add.text(400, 520, `KODE AKHIR: ${this.roomCode}`, {
-      fontSize: "30px",
-      color: "#ffffff",
-    }).setOrigin(0.5);
-
-    // FIX: lebih stabil pakai window event (konsisten dengan scene lain)
-    window.dispatchEvent(
-      new CustomEvent("puzzleCompleted", {
-        detail: this.roomCode,
-      })
+    const panel = this.add.rectangle(
+      400,
+      560,
+      300,
+      50,
+      0x00aa44,
+      0.9
     );
+
+    panel.setStrokeStyle(2, 0xffffff);
+
+    this.add
+      .text(400, 560, "✓ Struktur Gaya Lengkap", {
+        fontSize: "22px",
+        color: "#ffffff",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
+      })
+      .setOrigin(0.5);
+
+    this.time.delayedCall(1500, () => {
+      window.dispatchEvent(
+        new CustomEvent("puzzleCompleted", {
+          detail: "gaya",
+        })
+      );
+    });
   }
 }

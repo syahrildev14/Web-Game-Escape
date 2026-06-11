@@ -26,6 +26,8 @@ interface MenuSelectionProps {
     pre: { score: number; answers: number[] };
     post: { score: number; answers: number[] };
   }) => void;
+
+  onCompleted?: (completed: boolean) => void;
 }
 
 const MenuSelection: React.FC<MenuSelectionProps> = ({
@@ -33,6 +35,7 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
   posttestQuestions,
   puzzleGame,
   onFinish,
+  onCompleted,
 }) => {
   const [showPre, setShowPre] = useState(false);
   const [showPost, setShowPost] = useState(false);
@@ -54,6 +57,20 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
 
   const isPretestDone = !!pretestResult;
   const isPosttestDone = !!posttestResult;
+
+  useEffect(() => {
+    const completed =
+      isPretestDone &&
+      isPosttestDone &&
+      isPuzzleDone;
+
+    onCompleted?.(completed);
+  }, [
+    isPretestDone,
+    isPosttestDone,
+    isPuzzleDone,
+    onCompleted,
+  ]);
 
   // 🔥 ROOM AKTIF (sementara hardcode, bisa dari router nanti)
   const location = useLocation();
@@ -171,10 +188,13 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
           onSubmit={(data) => {
             setPretestResult(data);
             setReviewData(data.reviewData || []);
-            setResult({ title: "Pre-test Selesai", score: data.score });
+
+            setResult({
+              title: "Pre-test Selesai",
+              score: data.score,
+            });
 
             setShowPre(false);
-            setTimeout(() => setShowPost(true), 800);
           }}
           onClose={() => setShowPre(false)}
         />

@@ -1,0 +1,39 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getGlobalRanking = getGlobalRanking;
+const db_1 = __importDefault(require("../config/db"));
+async function getGlobalRanking(req, res) {
+    try {
+        // 1️⃣ Ambil semua result dari MySQL
+        const [rows] = await db_1.default.query("SELECT playerName, pretestScore, posttestScore FROM results");
+        const results = rows;
+        // 2️⃣ Hitung rata-rata tiap record
+        const withAvg = results.map((r) => ({
+            playerName: r.playerName,
+            avgScore: (r.pretestScore + r.posttestScore) / 2,
+        }));
+        // 3️⃣ Group berdasarkan playerName
+        const grouped = {};
+        withAvg.forEach((r) => {
+            if (!grouped[r.playerName]) {
+                grouped[r.playerName] = [];
+            }
+            grouped[r.playerName].push(r.avgScore);
+        });
+        // 4️⃣ Hitung rata-rata total per player
+        const ranking = Object.entries(grouped).map(([playerName, scores]) => {
+            const totalAvg = scores.reduce((a, b) => a + b, 0) / scores.length;
+            return { playerName, totalAvg };
+        });
+        // 5️⃣ Sort descending
+        ranking.sort((a, b) => b.totalAvg - a.totalAvg);
+        return res.json(ranking);
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Gagal memuat ranking" });
+    }
+}

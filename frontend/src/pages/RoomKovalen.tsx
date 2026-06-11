@@ -14,6 +14,7 @@ const RoomKovalen: React.FC = () => {
   const [showFinalDialog, setShowFinalDialog] = useState(false);
   const [pretest, setPretest] = useState<any[]>([]);
   const [posttest, setPosttest] = useState<any[]>([]);
+   const [menuCompleted, setMenuCompleted] = useState(false);
 
   useEffect(() => {
     axios
@@ -66,6 +67,7 @@ const RoomKovalen: React.FC = () => {
         posttestQuestions={posttest}
         puzzleGame={<KovalenPuzzleWrapper />}
         onFinish={handleFinish}
+        onCompleted={setMenuCompleted}
       />
 
 
@@ -97,6 +99,7 @@ const RoomKovalen: React.FC = () => {
           <NextButton
             label="Ke Ruangan Berikutnya"
             onClick={() => setShowFinalDialog(true)}
+            disabled={!menuCompleted}
           />
         </div>
       )}

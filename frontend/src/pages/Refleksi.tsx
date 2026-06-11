@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import GradientBlinds from "../components/GradientBlind";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export default function Refleksi() {
   const [form, setForm] = useState({
@@ -18,16 +19,23 @@ export default function Refleksi() {
       !form.strategy ||
       !form.rating
     ) {
-      alert("Semua field wajib diisi");
+      Swal.fire({
+        icon: "warning",
+        title: "Form Belum Lengkap",
+        text: "Semua field wajib diisi",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
     const playerName = localStorage.getItem("playerName");
 
-    console.log("playerName:", playerName);
-
     if (!playerName) {
-      alert("Nama pemain tidak ditemukan");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Nama pemain tidak ditemukan",
+      });
       return;
     }
 
@@ -39,11 +47,18 @@ export default function Refleksi() {
       rating: Number(form.rating),
     };
 
-    console.log("Payload:", payload);
-
     try {
+      Swal.fire({
+        title: "Menyimpan Refleksi...",
+        text: "Mohon tunggu sebentar",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const response = await fetch(
-        "http://localhost:5000/api/reflections",
+        "https://api.chemescape.com/api/reflections",
         {
           method: "POST",
           headers: {
@@ -53,17 +68,20 @@ export default function Refleksi() {
         }
       );
 
-      console.log("Status:", response.status);
-
       const data = await response.json();
 
-      console.log("Response:", data);
+      Swal.close();
 
       if (!response.ok) {
         throw new Error(data.message || "Gagal menyimpan refleksi");
       }
 
-      alert(data.message);
+      await Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: data.message,
+        confirmButtonText: "OK",
+      });
 
       setForm({
         learned: "",
@@ -71,9 +89,17 @@ export default function Refleksi() {
         strategy: "",
         rating: "",
       });
-    } catch (error) {
-      console.error("ERROR:", error);
-      alert("Gagal menyimpan refleksi");
+    } catch (error: any) {
+      Swal.close();
+
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: error.message || "Gagal menyimpan refleksi",
+        confirmButtonText: "OK",
+      });
+
+      console.error(error);
     }
   };
 

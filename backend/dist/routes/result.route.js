@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const result_controller_1 = require("../controllers/result.controller");
+const globalRangking_controller_1 = require("../controllers/globalRangking.controller");
+const router = (0, express_1.Router)();
+router.post("/", result_controller_1.saveResult);
+router.get("/room/:room", result_controller_1.getResultsByRoom);
+router.delete("/:id", result_controller_1.deleteResult);
+router.get("/ranking/global", globalRangking_controller_1.getGlobalRanking);
+exports.default = router;

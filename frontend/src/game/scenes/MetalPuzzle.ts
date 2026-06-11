@@ -9,15 +9,10 @@ export default class MetalPuzzle extends Phaser.Scene {
   private correct = 0;
   private total = 4;
 
-  private roomCode: string = "METAL-005";
-
   constructor() {
     super("MetalPuzzle");
   }
 
-  init(data: any) {
-    this.roomCode = data?.roomCode || "METAL-005";
-  }
 
   preload(): void {
     this.load.image("bg", bgMetal);
@@ -29,47 +24,106 @@ export default class MetalPuzzle extends Phaser.Scene {
   create(): void {
     this.correct = 0;
 
-    /** 🪙 Background */
-    this.add.image(400, 300, "bg").setDisplaySize(800, 600);
+    // ================= BACKGROUND =================
+    this.add
+      .image(400, 300, "bg")
+      .setDisplaySize(800, 600)
+      .setAlpha(0.8);
 
-    /** 🌊 Electron sea animation */
+    // ================= PANEL INSTRUKSI =================
+    const infoBox = this.add.rectangle(
+      400,
+      95,
+      720,
+      120,
+      0x000000,
+      0.55
+    );
+
+    infoBox.setStrokeStyle(2, 0x4ade80);
+
+    this.add
+      .text(400, 40, "Puzzle Ikatan Logam", {
+        fontSize: "28px",
+        color: "#ffffff",
+        fontFamily: "Poppins",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5);
+
+    this.add
+      .text(
+        400,
+        75,
+        "Tugas: Cocokkan karakteristik logam dengan penjelasan yang tepat.",
+        {
+          fontSize: "16px",
+          color: "#facc15",
+          fontFamily: "Poppins",
+          align: "center",
+          wordWrap: { width: 650 },
+        }
+      )
+      .setOrigin(0.5);
+
+    this.add
+      .text(
+        400,
+        110,
+        "1. Seret kartu penjelasan.\n2. Cocokkan dengan sifat logam yang sesuai.\n3. Semua pasangan harus benar agar kisi logam stabil.",
+        {
+          fontSize: "14px",
+          color: "#ffffff",
+          align: "center",
+          fontFamily: "Poppins",
+        }
+      )
+      .setOrigin(0.5);
+
+    // ================= ELECTRON SEA =================
     const sea = this.add
-      .image(400, 330, "sea")
-      .setAlpha(0.4)
+      .image(400, 340, "sea")
+      .setAlpha(0.3)
+      .setScale(1.1)
       .setBlendMode(Phaser.BlendModes.ADD);
 
     this.tweens.add({
       targets: sea,
-      alpha: { from: 0.25, to: 0.45 },
+      alpha: { from: 0.2, to: 0.45 },
       duration: 2500,
-      yoyo: true,
       repeat: -1,
+      yoyo: true,
       ease: "Sine.easeInOut",
     });
 
-    /** 🧠 Narasi */
-    this.add.text(
-      400,
-      30,
-      "Ikatan logam bergantung pada lautan elektron delokalisasi.\nAtur kembali kisi logam ini!",
-      {
+    // ================= LABEL AREA =================
+    this.add
+      .text(180, 165, "PENJELASAN", {
         fontSize: "20px",
-        color: "#d0f4ff",
-        align: "center",
+        color: "#93c5fd",
+        fontStyle: "bold",
         fontFamily: "Poppins",
-        wordWrap: { width: 720 },
-      }
-    ).setOrigin(0.5);
+      })
+      .setOrigin(0.5);
 
-    /** SLOT */
+    this.add
+      .text(540, 165, "SIFAT LOGAM", {
+        fontSize: "20px",
+        color: "#86efac",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
+      })
+      .setOrigin(0.5);
+
+    // ================= SLOT =================
     const slots = [
-      this.createSlot(520, 180, "Konduktivitas listrik"),
-      this.createSlot(520, 260, "Konduktivitas panas"),
-      this.createSlot(520, 340, "Dapat ditempa"),
-      this.createSlot(520, 420, "Dapat ditarik"),
+      this.createSlot(560, 220, "Konduktivitas listrik"),
+      this.createSlot(560, 300, "Konduktivitas panas"),
+      this.createSlot(560, 380, "Dapat ditempa"),
+      this.createSlot(560, 460, "Dapat ditarik"),
     ];
 
-    /** CARD DATA */
+    // ================= CARD =================
     const cards = [
       { text: "Elektron bebas bergerak", accept: 0 },
       { text: "Energi mudah berpindah", accept: 1 },
@@ -77,21 +131,37 @@ export default class MetalPuzzle extends Phaser.Scene {
       { text: "Ikatan tidak kaku", accept: 3 },
     ];
 
-    cards.forEach((c, i) => {
-      this.createCard(180, 180 + i * 80, c.text, c.accept, slots);
+    cards.forEach((card, index) => {
+      this.createCard(
+        180,
+        220 + index * 80,
+        card.text,
+        card.accept,
+        slots
+      );
     });
   }
 
   /** SLOT */
-  private createSlot(x: number, y: number, label: string) {
+  private createSlot(
+    x: number,
+    y: number,
+    label: string
+  ) {
     const slot = this.add.image(x, y, "slot");
 
-    this.add.text(x, y, label, {
-      fontSize: "14px",
-      color: "#ffffff",
-      align: "center",
-      wordWrap: { width: 140 },
-    }).setOrigin(0.5);
+    slot.setScale(0.9);
+    slot.setAlpha(0.85);
+
+    this.add
+      .text(x, y, label, {
+        fontSize: "14px",
+        color: "#ffffff",
+        align: "center",
+        fontFamily: "Poppins",
+        wordWrap: { width: 150 },
+      })
+      .setOrigin(0.5);
 
     return slot;
   }
@@ -174,14 +244,32 @@ export default class MetalPuzzle extends Phaser.Scene {
 
   /** 🔐 FINISH */
   private finishPuzzle() {
-    this.add.text(400, 560, `Kisi Logam Stabil!\nCode: ${this.roomCode}`, {
-      fontSize: "28px",
-      color: "#00fff2",
-      align: "center",
-      fontFamily: "Poppins",
-    }).setOrigin(0.5);
+    const panel = this.add.rectangle(
+      400,
+      560,
+      300,
+      50,
+      0x00aa44,
+      0.9
+    );
 
-    // 🔥 EVENT UNTUK REACT / ZUSTAND
-    this.game.events.emit("puzzleCompleted", this.roomCode);
+    panel.setStrokeStyle(2, 0xffffff);
+
+    this.add
+      .text(400, 560, "✓ Struktur Logam Lengkap", {
+        fontSize: "22px",
+        color: "#ffffff",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
+      })
+      .setOrigin(0.5);
+
+    this.time.delayedCall(1500, () => {
+      window.dispatchEvent(
+        new CustomEvent("puzzleCompleted", {
+          detail: "logam",
+        })
+      );
+    });
   }
 }

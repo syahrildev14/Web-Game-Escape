@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import plus from "../assets/ion/ion+.svg";
 import minus from "../assets/ion/ion-.svg";
-import na from "../assets/ion/na+.svg";
-import cl from "../assets/ion/cl-.svg";
+import na from "../assets/ion/na+.png";
+import cl from "../assets/ion/cl-.png";
 import bgBlue from "../assets/ion/cahayabiru.svg";
 
 export default class IonPuzzle extends Phaser.Scene {

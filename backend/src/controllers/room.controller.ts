@@ -8,7 +8,9 @@ export async function getRooms(req: Request, res: Response) {
 
 export async function updateRoomCode(req: Request, res: Response) {
   try {
-    const { room } = req.params;
+    const room = Array.isArray(req.params.room)
+      ? req.params.room[0]
+      : req.params.room;
     const { code } = req.body;
 
     const result = await RoomService.updateRoomCode(room, code);

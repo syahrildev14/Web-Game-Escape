@@ -14,6 +14,7 @@ const RoomLogam: React.FC = () => {
   const [showFinalDialog, setShowFinalDialog] = useState(false);
   const [pretest, setPretest] = useState<any[]>([]);
   const [posttest, setPosttest] = useState<any[]>([]);
+  const [menuCompleted, setMenuCompleted] = useState(false);
 
   useEffect(() => {
     axios
@@ -66,6 +67,7 @@ const RoomLogam: React.FC = () => {
         posttestQuestions={posttest}
         puzzleGame={<LogamPuzzleWrapper />}
         onFinish={handleFinish}
+        onCompleted={setMenuCompleted}
       />
 
 
@@ -98,6 +100,7 @@ const RoomLogam: React.FC = () => {
           <NextButton
             label="Ke Ruangan Berikutnya"
             onClick={() => setShowFinalDialog(true)}
+            disabled={!menuCompleted}
           />
         </div>
       )}

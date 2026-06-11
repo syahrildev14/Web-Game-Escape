@@ -80,21 +80,3 @@ export async function deleteResult(req: Request, res: Response) {
     return res.status(500).json({ message: "Terjadi kesalahan server" });
   }
 }
-
-export async function deleteResult(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
-    console.log("DELETE ID:", id);
-
-    await db.query(
-      "DELETE FROM results WHERE id = ?",
-      [Number(id)]
-    );
-
-    return res.json({ message: "Data berhasil dihapus" });
-
-  } catch (err: any) {
-    console.error("DELETE ERROR:", err);
-    return res.status(500).json({ message: "Terjadi kesalahan server" });
-  }
-}

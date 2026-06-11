@@ -41,38 +41,109 @@ export default class ElektroPuzzle extends Phaser.Scene {
   }
 
   create(): void {
-    // BACKGROUND
-    this.add.image(400, 300, "bg").setDisplaySize(800, 600).setAlpha(0.85);
-
-    // NARASI
+    // ================= BACKGROUND =================
     this.add
-      .text(
-        400,
-        20,
-        "“Elektronegativitas menentukan polaritas.”",
-        {
-          fontSize: "20px",
-          color: "#9efcff",
-          align: "center",
-          wordWrap: { width: 700 },
-        }
-      )
-      .setOrigin(0.5, 0);
+      .image(400, 300, "bg")
+      .setDisplaySize(800, 600)
+      .setAlpha(0.8);
+
+    // ================= PANEL INSTRUKSI =================
+    const infoBox = this.add.rectangle(
+      400,
+      95,
+      720,
+      120,
+      0x000000,
+      0.55
+    );
+
+    infoBox.setStrokeStyle(2, 0x4ade80);
 
     this.add
-      .text(400, 85, "Seret pasangan atom ke POLAR / NONPOLAR", {
-        fontSize: "22px",
+      .text(400, 40, "Puzzle Polaritas Molekul", {
+        fontSize: "28px",
         color: "#ffffff",
+        fontFamily: "Poppins",
+        fontStyle: "bold",
       })
       .setOrigin(0.5);
 
-    // SLOT
-    this.createSlot(250, 400, "polar");
-    this.createSlot(550, 400, "nonpolar");
+    this.add
+      .text(
+        400,
+        75,
+        "Tugas: Kelompokkan pasangan atom berdasarkan polaritas ikatannya.",
+        {
+          fontSize: "16px",
+          color: "#facc15",
+          fontFamily: "Poppins",
+          align: "center",
+          wordWrap: { width: 650 },
+        }
+      )
+      .setOrigin(0.5);
 
-    // DRAGGABLE
+    this.add
+      .text(
+        400,
+        110,
+        "1. Seret pasangan atom.\n2. Letakkan ke area Polar atau Nonpolar.\n3. Jika benar objek akan berubah menjadi hijau.",
+        {
+          fontSize: "14px",
+          color: "#ffffff",
+          fontFamily: "Poppins",
+          align: "center",
+        }
+      )
+      .setOrigin(0.5);
+
+    // ================= LABEL =================
+    this.add
+      .text(250, 210, "IKATAN POLAR", {
+        fontSize: "22px",
+        color: "#60a5fa",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
+      })
+      .setOrigin(0.5);
+
+    this.add
+      .text(550, 210, "IKATAN NONPOLAR", {
+        fontSize: "22px",
+        color: "#86efac",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
+      })
+      .setOrigin(0.5);
+
+    // ================= SLOT =================
+    this.createSlot(250, 340, "polar");
+    this.createSlot(550, 340, "nonpolar");
+
+    // ================= GLOBAL DRAG =================
+    this.input.on(
+      "drag",
+      (
+        _pointer: Phaser.Input.Pointer,
+        obj: Phaser.GameObjects.Image,
+        dragX: number,
+        dragY: number
+      ) => {
+        obj.x = dragX;
+        obj.y = dragY;
+      }
+    );
+
+    this.input.on(
+      "dragend",
+      (_pointer: Phaser.Input.Pointer, obj: Phaser.GameObjects.Image) => {
+        this.checkDrop(obj);
+      }
+    );
+
+    // ================= DRAGGABLE =================
     this.pairs.forEach((pair, index) => {
-      this.createDraggable(200 + index * 140, 520, pair);
+      this.createDraggable(140 + index * 170, 530, pair);
     });
   }
 
@@ -83,7 +154,11 @@ export default class ElektroPuzzle extends Phaser.Scene {
   }
 
   // ================= DRAG =================
-  private createDraggable(x: number, y: number, config: PairConfig) {
+  private createDraggable(
+    x: number,
+    y: number,
+    config: PairConfig
+  ) {
     const obj = this.add.image(x, y, config.key).setInteractive();
 
     obj.setData("answer", config.answer);
@@ -92,26 +167,16 @@ export default class ElektroPuzzle extends Phaser.Scene {
 
     this.input.setDraggable(obj);
 
-    this.input.on(
-      "drag",
-      (
-        _p: Phaser.Input.Pointer,
-        target: Phaser.GameObjects.Image,
-        dx: number,
-        dy: number
-      ) => {
-        if (target === obj) {
-          target.x = dx;
-          target.y = dy;
-        }
-      });
+    this.tweens.add({
+      targets: obj,
+      angle: { from: -5, to: 5 },
+      duration: 1800,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
 
-    this.input.on(
-      "dragend",
-      (_p: Phaser.Input.Pointer, target: Phaser.GameObjects.GameObject) => {
-        this.checkDrop(target as Phaser.GameObjects.Image);
-      }
-    );
+    return obj;
   }
 
   // ================= CHECK =================
@@ -142,12 +207,14 @@ export default class ElektroPuzzle extends Phaser.Scene {
     slot: Phaser.GameObjects.Image
   ) {
     obj.disableInteractive();
-    obj.setPosition(slot.x, slot.y - 40);
-    obj.setTint(0x00ffcc);
+
+    obj.setPosition(slot.x, slot.y - 50);
+
+    obj.setTint(0x00ff99);
 
     this.correctCount++;
 
-    if (this.correctCount === this.totalPairs) {
+    if (this.correctCount >= this.totalPairs) {
       this.finishPuzzle();
     }
   }
@@ -165,15 +232,27 @@ export default class ElektroPuzzle extends Phaser.Scene {
 
   // ================= FINISH =================
   private finishPuzzle() {
+    const panel = this.add.rectangle(
+      400,
+      560,
+      260,
+      50,
+      0x00aa44,
+      0.9
+    );
+
+    panel.setStrokeStyle(2, 0xffffff);
+
     this.add
-      .text(400, 560, "Puzzle Selesai!", {
-        fontSize: "26px",
-        color: "#00ffe1",
+      .text(400, 560, "✓ Puzzle Selesai", {
+        fontSize: "22px",
+        color: "#ffffff",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
       })
       .setOrigin(0.5);
 
-    this.time.delayedCall(1200, () => {
-      // 🔥 FIX: konsisten dengan semua wrapper
+    this.time.delayedCall(1500, () => {
       window.dispatchEvent(
         new CustomEvent("puzzleCompleted", {
           detail: "C",

@@ -16,7 +16,7 @@ export default function AdminReflections() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/reflections")
+        fetch("https://api.chemescape.com/api/reflections")
             .then((res) => res.json())
             .then((data) => {
                 setReflections(data.data || data);
