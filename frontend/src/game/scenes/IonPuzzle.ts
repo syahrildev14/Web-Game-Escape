@@ -154,12 +154,27 @@ export default class IonPuzzle extends Phaser.Scene {
 
   // ================= FINISH =================
   private finishPuzzle() {
-    this.add.text(220, 550, "Stabilizer Aktif!", {
-      fontSize: "20px",
-      color: "#ffffff",
-    });
+    const panel = this.add.rectangle(
+      400,
+      560,
+      260,
+      50,
+      0x00aa44,
+      0.9
+    );
 
-    this.time.delayedCall(1200, () => {
+    panel.setStrokeStyle(2, 0xffffff);
+
+    this.add
+      .text(400, 560, "✓ Puzzle Selesai", {
+        fontSize: "22px",
+        color: "#ffffff",
+        fontStyle: "bold",
+        fontFamily: "Poppins",
+      })
+      .setOrigin(0.5);
+
+    this.time.delayedCall(1500, () => {
       window.dispatchEvent(
         new CustomEvent("puzzleCompleted", {
           detail: "ion",

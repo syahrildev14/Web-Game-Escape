@@ -49,6 +49,8 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
   const [posttestResult, setPosttestResult] = useState<any>(null);
   const [result, setResult] = useState<any>(null);
 
+  const [isPuzzleCompleted, setIsPuzzleCompleted] = useState(false);
+
   const { codes, fetchCodes } = useGameStore();
 
   useEffect(() => {
@@ -71,6 +73,30 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
     isPuzzleDone,
     onCompleted,
   ]);
+
+  useEffect(() => {
+    const handlePuzzleCompleted = () => {
+      setIsPuzzleCompleted(true);
+    };
+
+    window.addEventListener(
+      "puzzleCompleted",
+      handlePuzzleCompleted
+    );
+
+    return () => {
+      window.removeEventListener(
+        "puzzleCompleted",
+        handlePuzzleCompleted
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showPuzzle) {
+      setIsPuzzleCompleted(false);
+    }
+  }, [showPuzzle]);
 
   // 🔥 ROOM AKTIF (sementara hardcode, bisa dari router nanti)
   const location = useLocation();
@@ -224,16 +250,18 @@ const MenuSelection: React.FC<MenuSelectionProps> = ({
 
             {puzzleGame}
 
-            <button
-              onClick={() => {
-                setIsPuzzleDone(true);
-                setShowPuzzle(false);
-                setShowCode(true);
-              }}
-              className="absolute bottom-4 right-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg"
-            >
-              Selesai ✅
-            </button>
+            {isPuzzleCompleted && (
+              <button
+                onClick={() => {
+                  setIsPuzzleDone(true);
+                  setShowPuzzle(false);
+                  setShowCode(true);
+                }}
+                className="absolute bottom-4 right-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg"
+              >
+                Selesai ✅
+              </button>
+            )}
 
           </div>
         </PuzzleModal>

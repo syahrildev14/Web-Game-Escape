@@ -13,7 +13,7 @@ import bgDim from "../../assets/background/bgdim.jpg";
 
 export default class KovalenPuzzleScene extends Phaser.Scene {
   private correctCount = 0;
-  private totalCorrect = 4;
+  private totalCorrect = 3;
 
   constructor() {
     super("KovalenPuzzle");
@@ -33,18 +33,36 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
   }
 
   create(): void {
+    const width = this.scale.width;
+    const height = this.scale.height;
+
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const leftX = width * 0.25;
+    const rightX = width * 0.75;
+
+    const row1 = height * 0.38;
+    const row2 = height * 0.62;
+
+    const bottomY = height * 0.82;
+
+    this.scale.on("resize", this.handleResize, this);
+
+    console.log("Scene Size:", width, height);
+
     // ================= BACKGROUND =================
     this.add
-      .image(400, 300, "bg")
-      .setDisplaySize(800, 600)
+      .image(centerX, centerY, "bg")
+      .setDisplaySize(width, height)
       .setAlpha(0.8);
 
     // ================= PANEL INSTRUKSI =================
     const infoBox = this.add.rectangle(
-      400,
-      95,
-      720,
-      120,
+      centerX,
+      height * 0.16,
+      width * 0.85,
+      110,
       0x000000,
       0.55
     );
@@ -52,7 +70,7 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
     infoBox.setStrokeStyle(2, 0x4ade80);
 
     this.add
-      .text(400, 40, "Puzzle Ikatan Kovalen", {
+      .text(centerX, height * 0.06, "Puzzle Ikatan Kovalen", {
         fontSize: "28px",
         color: "#ffffff",
         fontFamily: "Poppins",
@@ -62,23 +80,23 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
 
     this.add
       .text(
-        400,
-        75,
+        centerX,
+        height * 0.12,
         "Tugas: Cocokkan molekul dengan jenis ikatan dan representasi elektronnya.",
         {
           fontSize: "16px",
           color: "#facc15",
           fontFamily: "Poppins",
           align: "center",
-          wordWrap: { width: 650 },
+          wordWrap: { width: width * 0.7 },
         }
       )
       .setOrigin(0.5);
 
     this.add
       .text(
-        400,
-        110,
+        centerX,
+        height * 0.18,
         "1. Seret molekul H₂, O₂, atau CO₂.\n2. Letakkan pada gambar yang sesuai.\n3. Jika benar akan berubah menjadi hijau.",
         {
           fontSize: "14px",
@@ -91,7 +109,7 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
 
     // ================= LABEL AREA =================
     this.add
-      .text(220, 170, "Representasi Elektron", {
+      .text(leftX, row1 - 80, "Representasi Elektron", {
         fontSize: "18px",
         color: "#93c5fd",
         fontStyle: "bold",
@@ -99,7 +117,7 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(580, 170, "Representasi Elektron", {
+      .text(rightX, row1 - 80, "Representasi Elektron", {
         fontSize: "18px",
         color: "#93c5fd",
         fontStyle: "bold",
@@ -107,7 +125,7 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(220, 320, "Ikatan Tunggal", {
+      .text(leftX, row2 - 80, "Ikatan Tunggal", {
         fontSize: "18px",
         color: "#86efac",
         fontStyle: "bold",
@@ -115,7 +133,7 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(580, 320, "Ikatan Rangkap Dua", {
+      .text(rightX, row2 - 80, "Ikatan Rangkap Dua", {
         fontSize: "18px",
         color: "#fca5a5",
         fontStyle: "bold",
@@ -144,16 +162,24 @@ export default class KovalenPuzzleScene extends Phaser.Scene {
     );
 
     // ================= SLOT =================
-    this.createSlot(220, 240, "e1", ["H2"]);
-    this.createSlot(580, 240, "e2", ["O2", "CO2"]);
+    this.createSlot(leftX, row1, "e1", ["H2"]);
+    this.createSlot(rightX, row1, "e2", ["O2", "CO2"]);
 
-    this.createSlot(220, 390, "single", ["H2"]);
-    this.createSlot(580, 390, "double", ["O2", "CO2"]);
+    this.createSlot(leftX, row2, "single", ["H2"]);
+    this.createSlot(rightX, row2, "double", ["O2", "CO2"]);
 
     // ================= MOLEKUL =================
-    this.createDraggable(150, 540, "h2", "H2");
-    this.createDraggable(400, 540, "o2", "O2");
-    this.createDraggable(650, 540, "co2", "CO2");
+    this.createDraggable(width * 0.2, bottomY, "h2", "H2");
+    this.createDraggable(width * 0.5, bottomY, "o2", "O2");
+    this.createDraggable(width * 0.8, bottomY, "co2", "CO2");
+  }
+
+  private handleResize() {
+    console.log(
+      "Resize:",
+      this.scale.width,
+      this.scale.height
+    );
   }
 
   // ================= DRAGGABLE =================

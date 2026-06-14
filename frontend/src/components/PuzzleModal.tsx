@@ -18,7 +18,7 @@ const PuzzleModal: React.FC<PuzzleModalProps> = ({ onClose, children }) => {
       >
         <h2 className="text-xl font-bold mb-3">Puzzle Game</h2>
 
-        <div style={{ width: "100%", height: "100%", borderRadius: "12px" }}>
+        <div className="w-full h-full overflow-auto rounded-xl">
           {children}
         </div>
 
